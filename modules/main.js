@@ -13,7 +13,18 @@ function handleWindow(aWindow)
 	if (doc.documentElement.getAttribute('windowtype') != TYPE_BROWSER)
 		return;
 
-	/* something */
+	/* sample: hello world */
+	var range = doc.createRange();
+	range.selectNodeContents(doc.documentElement);
+	range.collapse(false);
+
+	var fragment = range.createContextualFragment(<![CDATA[
+			<label id="helloworld" value="hello, world!"
+				style="background: white; color: blue;"/>
+		]]>.toString());
+	range.insertNode(fragment);
+
+	range.detach();
 }
 
 WindowManager.getWindows(TYPE_BROWSER).forEach(handleWindow);
@@ -22,6 +33,9 @@ WindowManager.addHandler(handleWindow);
 function shutdown()
 {
 	WindowManager.getWindows(TYPE_BROWSER).forEach(function(aWindow) {
-		/* something */
+		/* sample: destructor for hello world */
+		var doc = aWindow.document;
+		var label = doc.getElementById('helloworld');
+		label.parentNode.removeChild(label);
 	});
 }
