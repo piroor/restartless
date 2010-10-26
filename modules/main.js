@@ -1,10 +1,20 @@
+/**
+ * import() works like Components.utils.import(). EXPORTED_SYMBOLS
+ * in imported scripts are exported to the global object of this script.
+ */
 import('lib/jsdeferred.js');
 import('lib/WindowManager.js');
 
+/**
+ * JSDeferred sample.
+ */
 Deferred.next(function() {
 	dump('MAIN MODULE IS LOADED\n');
 });
 
+/**
+ * Sample code for addons around browser windows.
+ */
 const TYPE_BROWSER = 'navigator:browser';
 
 function handleWindow(aWindow)
@@ -30,6 +40,10 @@ function handleWindow(aWindow)
 WindowManager.getWindows(TYPE_BROWSER).forEach(handleWindow);
 WindowManager.addHandler(handleWindow);
 
+/**
+ * A handler for shutdown event. This will be called when the addon
+ * is disabled or uninstalled (include updating).
+ */
 function shutdown()
 {
 	WindowManager.getWindows(TYPE_BROWSER).forEach(function(aWindow) {
