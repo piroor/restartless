@@ -12,9 +12,9 @@
 const EXPORTED_SYMBOLS = ['WindowManager'];
 
 var _WindowWatcher = Cc['@mozilla.org/embedcomp/window-watcher;1']
-						.getService(Ci.nsI_WindowWatcher);
+						.getService(Ci.nsIWindowWatcher);
 var _WindowMediator = Cc['@mozilla.org/appshell/window-mediator;1']
-						.getService(Ci.nsI_WindowMediator);
+						.getService(Ci.nsIWindowMediator);
 
 var _gListener = {
 		observe : function(aSubject, aTopic, aData)
