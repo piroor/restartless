@@ -1,26 +1,34 @@
-<?xml version="1.0" encoding="utf-8"?><RDF xmlns="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:em="http://www.mozilla.org/2004/em-rdf#">
-  <Description about="urn:mozilla:install-manifest">
-    <em:id>restartless@piro.sakura.ne.jp</em:id>
-    <em:version>1.0</em:version>
-    <em:type>2</em:type>
-    <em:bootstrap>true</em:bootstrap>
-    <em:unpack>true</em:unpack>
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<RDF:RDF xmlns:em="http://www.mozilla.org/2004/em-rdf#"
+         xmlns:NC="http://home.netscape.com/NC-rdf#"
+         xmlns:RDF="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+  <RDF:Description RDF:about="urn:mozilla:install-manifest"
+                   em:id="restartless@piro.sakura.ne.jp"
+                   em:name="Restartless Addon"
+                   em:version="0.1"
+                   em:creator="SHIMODA Hiroshi"
+                   em:description="A template for restartless addons."
+                   em:homepageURL=""
+                   em:bootstrap="true"
+                   em:unpack="true">
+
+    <em:updateURL></em:updateURL>
+    <em:updateKey></em:updateKey>
+
+    <em:localized>
+      <RDF:Description em:locale="en-US"
+                       em:name="Restartless Addon"
+                       em:description="A template for restartless addons."
+                       em:homepageURL=""
+                       em:creator="SHIMODA Hiroshi">
+      </RDF:Description>
+    </em:localized>
 
     <!-- Firefox -->
     <em:targetApplication>
-      <Description>
-        <em:id>{ec8030f7-c20a-464f-9b0e-13a3a9e97384}</em:id>
-        <em:minVersion>3.6</em:minVersion>
-        <em:maxVersion>4.0b8pre</em:maxVersion>
-      </Description>
+      <RDF:Description em:id="{ec8030f7-c20a-464f-9b0e-13a3a9e97384}"
+                       em:minVersion="3.6"
+                       em:maxVersion="4.0b8pre" />
     </em:targetApplication>
-
-    <em:name>restartless</em:name>
-    <em:description>restartless addon test.</em:description>
-    <em:creator>SHIMODA Hiroshi aka Piro</em:creator>
-    <em:iconURL/>
-    
-    <em:optionsURL/>
-    
-  </Description>
-</RDF>
+  </RDF:Description>
+</RDF:RDF>
