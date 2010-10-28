@@ -64,7 +64,8 @@ function _exportSymbols(aSource, aTarget)
 		('EXPORTED_SYMBOLS' in aSource) &&
 		aSource.EXPORTED_SYMBOLS &&
 		aSource.EXPORTED_SYMBOLS.map &&
-		typeof aSource.EXPORTED_SYMBOLS.map == 'function') {
+		typeof aSource.EXPORTED_SYMBOLS.map == 'function'
+		) {
 		aSource.EXPORTED_SYMBOLS.map(function(aSymbol) {
 			aTarget[aSymbol] = aSource[aSymbol];
 		});
@@ -74,7 +75,8 @@ function _exportSymbols(aSource, aTarget)
 	if (
 		('exports' in aSource) &&
 		aSource.exports &&
-		typeof aSource.exports == 'object') {
+		typeof aSource.exports == 'object'
+		) {
 		for (let symbol in aSource.exports)
 		{
 			aTarget[symbol] = aSource[symbol];
