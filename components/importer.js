@@ -56,17 +56,30 @@ function import(aURISpec, aExportTarget)
 
 function _exportSymbols(aSource, aTarget)
 {
-	if (
-		!aTarget ||
-		!('EXPORTED_SYMBOLS' in aSource) ||
-		!aSource.EXPORTED_SYMBOLS ||
-		!aSource.EXPORTED_SYMBOLS.map ||
-		typeof aSource.EXPORTED_SYMBOLS.map != 'function'
-		)
+	if (!aTarget)
 		return;
-	aSource.EXPORTED_SYMBOLS.map(function(aSymbol) {
-		aTarget[aSymbol] = aSource[aSymbol];
-	});
+
+	// JavaScript code module style
+	if (
+		('EXPORTED_SYMBOLS' in aSource) &&
+		aSource.EXPORTED_SYMBOLS &&
+		aSource.EXPORTED_SYMBOLS.map &&
+		typeof aSource.EXPORTED_SYMBOLS.map == 'function') {
+		aSource.EXPORTED_SYMBOLS.map(function(aSymbol) {
+			aTarget[aSymbol] = aSource[aSymbol];
+		});
+	}
+
+	// CommonJS style
+	if (
+		('exports' in aSource) &&
+		aSource.exports &&
+		typeof aSource.exports == 'object') {
+		for (let symbol in aSource.exports)
+		{
+			aTarget[symbol] = aSource[symbol];
+		}
+	}
 }
 
 function _createNamespace(aURISpec)
@@ -78,20 +91,35 @@ function _createNamespace(aURISpec)
 					.getFileFromURLSpec(aURISpec);
 	var baseURI = IOService.newFileURI(baseFile);
 	var ns = {
+			__proto__ : _namespacePrototype,
 			location : {
 				href : aURISpec,
 				toString : function() {
 					return this.href;
 				}
 			},
-			__proto__ : _namespacePrototype
+			/** JavaScript code module style */
+			import : function(aURISpec, aExportTarget) {
+				var resolved = baseURI.resolve(aURISpec);
+				if (resolved == aURISpec)
+					throw new Error('Recursive import!');
+				return import(resolved, aExportTarget || ns);
+			},
+			/**
+			 * CommonJS style
+			 * @url http://www.commonjs.org/specs/
+			 */
+			require : function(aURISpec) {
+				aURISpec += '.js';
+				var resolved = baseURI.resolve(aURISpec);
+				if (resolved == aURISpec)
+					throw new Error('Recursive import!');
+				var exported = {};
+				import(resolved, exported);
+				return exported;
+			},
+			exports : {}
 		};
-	ns.import = function(aURISpec, aExportTarget) {
-		var resolved = baseURI.resolve(aURISpec);
-		if (resolved == aURISpec)
-			throw new Error('Recursive import!');
-		return import(resolved, aExportTarget || ns);
-	};
 	return ns;
 }
 
