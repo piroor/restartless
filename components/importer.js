@@ -36,7 +36,7 @@ var _namespaces;
  * @returns {Object}
  *   The global object for the imported script.
  */
-function import(aURISpec, aExportTarget)
+function import(aURISpec, aExportTarget, aRoot)
 {
 	if (!_namespaces)
 		_namespaces = {};
@@ -46,7 +46,7 @@ function import(aURISpec, aExportTarget)
 		_exportSymbols(ns, aExportTarget);
 		return ns;
 	}
-	ns = _createNamespace(aURISpec);
+	ns = _createNamespace(aURISpec, aRoot || aURISpec);
 	Components.classes['@mozilla.org/moz/jssubscript-loader;1']
 		.getService(Components.interfaces.mozIJSSubScriptLoader)
 		.loadSubScript(aURISpec, ns);
@@ -82,14 +82,14 @@ function _exportSymbols(aSource, aTarget)
 	}
 }
 
-function _createNamespace(aURISpec)
+function _createNamespace(aURISpec, aRoot)
 {
 	const IOService = Components.classes['@mozilla.org/network/io-service;1']
 						.getService(Components.interfaces.nsIIOService);
-	var baseFile = IOService.getProtocolHandler('file')
-					.QueryInterface(Components.interfaces.nsIFileProtocolHandler)
-					.getFileFromURLSpec(aURISpec);
-	var baseURI = IOService.newFileURI(baseFile);
+	const FileHandler = IOService.getProtocolHandler('file')
+						.QueryInterface(Components.interfaces.nsIFileProtocolHandler);
+	var baseURI = IOService.newFileURI(FileHandler.getFileFromURLSpec(aURISpec));
+	var rootURI = typeof aRoot == 'string' ? IOService.newFileURI(FileHandler.getFileFromURLSpec(aRoot)) : aRoot ;
 	var ns = {
 			__proto__ : _namespacePrototype,
 			location : {
@@ -103,19 +103,19 @@ function _createNamespace(aURISpec)
 				var resolved = baseURI.resolve(aURISpec);
 				if (resolved == aURISpec)
 					throw new Error('Recursive import!');
-				return import(resolved, aExportTarget || ns);
+				return import(resolved, aExportTarget || ns, rootURI);
 			},
 			/**
 			 * CommonJS style
 			 * @url http://www.commonjs.org/specs/
 			 */
 			require : function(aURISpec) {
-				aURISpec += '.js';
-				var resolved = baseURI.resolve(aURISpec);
+				if (!/\.jsm?$/.test(aURISpec)) aURISpec += '.js';
+				var resolved = (aURISpec.charAt(0) == '.' ? rootURI : baseURI ).resolve(aURISpec);
 				if (resolved == aURISpec)
 					throw new Error('Recursive import!');
 				var exported = {};
-				import(resolved, exported);
+				import(resolved, exported, rootURI);
 				return exported;
 			},
 			exports : {}
