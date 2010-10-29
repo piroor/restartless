@@ -94,12 +94,7 @@ function _createNamespace(aURISpec, aRoot)
 	var rootURI = typeof aRoot == 'string' ? IOService.newFileURI(FileHandler.getFileFromURLSpec(aRoot)) : aRoot ;
 	var ns = {
 			__proto__ : _namespacePrototype,
-			location : {
-				href : aURISpec,
-				toString : function() {
-					return this.href;
-				}
-			},
+			location : _createFakeLocation(baseURI),
 			/** JavaScript code module style */
 			import : function(aURISpec, aExportTarget) {
 				var resolved = baseURI.resolve(aURISpec);
@@ -123,6 +118,27 @@ function _createNamespace(aURISpec, aRoot)
 			exports : {}
 		};
 	return ns;
+}
+
+function _createFakeLocation(aFileURL)
+{
+	aFileURL = aFileURL.QueryInterface(Components.interfaces.nsIURL)
+					.QueryInterface(Components.interfaces.nsIURI);
+	return {
+		href     : aFileURL.spec,
+		search   : aFileURL.query ? '?'+aFileURL.query : '' ,
+		hash     : aFileURL.ref ? '#'+aFileURL.ref : '' ,
+		host     : aFileURL.hostPort,
+		hostname : aFileURL.host,
+		port     : aFileURL.port,
+		pathname : aFileURL.path,
+		protocol : aFileURL.scheme+':',
+		reload   : function() {},
+		replace  : function() {},
+		toString : function() {
+			return this.href;
+		}
+	};
 }
 
 function _callHandler(aHandler, aReason)
