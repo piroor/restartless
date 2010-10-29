@@ -2,14 +2,14 @@
  * import() works like Components.utils.import(). EXPORTED_SYMBOLS
  * in imported scripts are exported to the global object of this script.
  */
-import('lib/jstimer.jsm');
 import('lib/jsdeferred.js');
 import('lib/WindowManager.js');
 
 /**
  * Timer sample.
  */
-setTimeout(function() {
+var timer = require('lib/jstimer.jsm'); // CommonJS style require() also available!
+timer.setTimeout(function() {
 	dump('DELAYED CODE DONE\n');
 }, 500);
 
