@@ -36,10 +36,7 @@ StartupService.prototype = {
 	_xpcom_categories : [
 		{ category : 'app-startup', service : true }
 	],
-	QueryInterface : XPCOMUtils.generateQI([
-		Ci.nsIObserver,
-		Ci.nsICommandLineHandler
-	]),
+	QueryInterface : XPCOMUtils.generateQI([Ci.nsIObserver]),
 	get root()
 	{
 		if (!this._root) {
