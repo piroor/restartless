@@ -9,8 +9,7 @@
                    em:creator="SHIMODA Hiroshi"
                    em:description="A template for restartless addons."
                    em:homepageURL=""
-                   em:bootstrap="true"
-                   em:unpack="true">
+                   em:bootstrap="true">
 
     <em:updateURL></em:updateURL>
     <em:updateKey></em:updateKey>

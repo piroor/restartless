@@ -1,3 +1,5 @@
+dump('main.js loaded\n');
+
 /**
  * import() works like Components.utils.import(). EXPORTED_SYMBOLS
  * in imported scripts are exported to the global object of this script.

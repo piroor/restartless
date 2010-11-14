@@ -25,19 +25,29 @@ function _loadMain(aRoot, aReason)
 	const IOService = Components.classes['@mozilla.org/network/io-service;1']
 						.getService(Components.interfaces.nsIIOService);
 
-	var importer = aRoot.clone();
-	importer.append('components');
-	importer.append('importer.js');
+	var importer, main;
+	if (aRoot.isDirectory()) {
+		importer = aRoot.clone();
+		importer.append('components');
+		importer.append('importer.js');
+		importer = IOService.newFileURI(importer).spec;
+
+		main = aRoot.clone();
+		main.append('modules');
+		main.append('main.js');
+		main = IOService.newFileURI(main).spec;
+	}
+	else {
+		let base = 'jar:'+IOService.newFileURI(aRoot).spec+'!/';
+		importer = base + 'components/importer.js';
+		main = base + 'modules/main.js';
+	}
 
 	_gImporter = {};
 	Components.classes['@mozilla.org/moz/jssubscript-loader;1']
 		.getService(Components.interfaces.mozIJSSubScriptLoader)
-		.loadSubScript(IOService.newFileURI(importer).spec, _gImporter);
-
-	var main = aRoot.clone();
-	main.append('modules');
-	main.append('main.js');
-	_gImporter.import(IOService.newFileURI(main).spec);
+		.loadSubScript(importer, _gImporter);
+	_gImporter.import(main);
 }
 
 function _reasonToString(aReason)

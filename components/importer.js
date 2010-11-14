@@ -90,8 +90,15 @@ function _createNamespace(aURISpec, aRoot)
 						.getService(Components.interfaces.nsIIOService);
 	const FileHandler = IOService.getProtocolHandler('file')
 						.QueryInterface(Components.interfaces.nsIFileProtocolHandler);
-	var baseURI = IOService.newFileURI(FileHandler.getFileFromURLSpec(aURISpec));
-	var rootURI = typeof aRoot == 'string' ? IOService.newFileURI(FileHandler.getFileFromURLSpec(aRoot)) : aRoot ;
+	var baseURI = aURISpec.indexOf('file:') == 0 ?
+					IOService.newFileURI(FileHandler.getFileFromURLSpec(aURISpec)) :
+					IOService.newURI(aURISpec, null, null);
+	var rootURI = typeof aRoot == 'string' ?
+					(aRoot.indexOf('file:') == 0 ?
+						IOService.newFileURI(FileHandler.getFileFromURLSpec(aRoot)) :
+						IOService.newURI(aRoot, null, null)
+					) :
+					aRoot ;
 	var ns = {
 			__proto__ : _namespacePrototype,
 			location : _createFakeLocation(baseURI),
@@ -120,19 +127,19 @@ function _createNamespace(aURISpec, aRoot)
 	return ns;
 }
 
-function _createFakeLocation(aFileURL)
+function _createFakeLocation(aURI)
 {
-	aFileURL = aFileURL.QueryInterface(Components.interfaces.nsIURL)
+	aURI = aURI.QueryInterface(Components.interfaces.nsIURL)
 					.QueryInterface(Components.interfaces.nsIURI);
 	return {
-		href     : aFileURL.spec,
-		search   : aFileURL.query ? '?'+aFileURL.query : '' ,
-		hash     : aFileURL.ref ? '#'+aFileURL.ref : '' ,
-		host     : aFileURL.hostPort,
-		hostname : aFileURL.host,
-		port     : aFileURL.port,
-		pathname : aFileURL.path,
-		protocol : aFileURL.scheme+':',
+		href     : aURI.spec,
+		search   : aURI.query ? '?'+aURI.query : '' ,
+		hash     : aURI.ref ? '#'+aURI.ref : '' ,
+		host     : aURI.scheme == 'jar' ? '' : aURI.hostPort,
+		hostname : aURI.scheme == 'jar' ? '' : aURI.host,
+		port     : aURI.scheme == 'jar' ? -1 : aURI.port,
+		pathname : aURI.path,
+		protocol : aURI.scheme+':',
 		reload   : function() {},
 		replace  : function() {},
 		toString : function() {
