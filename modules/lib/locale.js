@@ -11,15 +11,24 @@
 
 const EXPORTED_SYMBOLS = ['get'];
 
+const DEFAULT_LOCALE = 'en-US';
+
 var gCache = {}
 var get = function(aURI) {
-		var locale = Application.prefs.getValue('general.useragent.locale', 'en-US');
+		var locale = DEFAULT_LOCALE;
+		try {
+			locale = Cc['@mozilla.org/preferences;1']
+						.getService(Ci.nsIPrefBranch)
+						.getCharPref('general.useragent.locale') || DEFAULT_LOCALE;
+		}
+		catch(e) {
+		}
 		var uri = aURI;
 		[
 			aURI+'.'+locale,
 			aURI+'.'+(locale.split('-')[0]),
-			aURI+'.en-US',
-			aURI+'.en'
+			aURI+'.'+DEFAULT_LOCALE,
+			aURI+'.'+(DEFAULT_LOCALE.split('-')[0])
 		].some(function(aURI) {
 			if (readFrom(aURI)) {
 				uri = aURI;
