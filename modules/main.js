@@ -62,4 +62,9 @@ function shutdown()
 		var label = doc.getElementById('helloworld');
 		label.parentNode.removeChild(label);
 	});
+
+	// free imported symbols
+	Deferred = void(0);
+	WindowManager = void(0);
+	timer = void(0);
 }

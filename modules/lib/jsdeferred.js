@@ -9,6 +9,16 @@ var clearTimeout  = window.clearTimeout;
 var setInterval   = window.setInterval;
 var clearInterval = window.clearInterval;
 
+function shutdown()
+{
+	// free imported symbols
+	setTimeout    = void(0);
+	clearTimeout  = void(0);
+	setInterval   = void(0);
+	clearInterval = void(0);
+	window        = void(0);
+}
+
 
 /* Header::
  * JSDeferred
