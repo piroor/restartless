@@ -23,6 +23,15 @@ Deferred.next(function() {
 });
 
 /**
+ * Localized messages sample.
+ */
+var bundle = require('lib/locale')
+				.get(location.href.replace(/[^\/]+$/, '')+
+						'locale/messages.properties');
+dump(bundle.getString('message')+'\n');
+
+
+/**
  * Sample code for addons around browser windows.
  */
 const TYPE_BROWSER = 'navigator:browser';
@@ -67,4 +76,5 @@ function shutdown()
 	Deferred = void(0);
 	WindowManager = void(0);
 	timer = void(0);
+	bundle = void(0);
 }
