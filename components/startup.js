@@ -5,8 +5,8 @@
  *
  * @license
  *   The MIT License, Copyright (c) 2010 SHIMODA "Piro" Hiroshi.
- *   http://www.cozmixng.org/repos/piro/restartless-addon/trunk/license.txt
- * @url http://www.cozmixng.org/repos/piro/restartless-addon/trunk/restartless/
+ *   https://github.com/piroor/restartless/blob/master/license.txt
+ * @url http://github.com/piroor/restartless
  */
 
 /** You must change ADDON_ID for your addon. */

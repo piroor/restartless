@@ -12,10 +12,10 @@
    namespace.clearInterval(interval);
 
  license: The MIT License, Copyright (c) 2010 SHIMODA "Piro" Hiroshi
-   http://www.cozmixng.org/repos/piro/fx3-compatibility-lib/trunk/license.txt
+   https://github.com/piroor/fxaddonlibs/blob/master/license.txt
  original:
-   http://www.cozmixng.org/repos/piro/fx3-compatibility-lib/trunk/jstimer.jsm
-   http://www.cozmixng.org/repos/piro/fx3-compatibility-lib/trunk/jstimer.test.js
+   https://github.com/piroor/fxaddonlibs/blob/master/jstimer.jsm
+   https://github.com/piroor/fxaddonlibs/blob/master/jstimer.test.js
 */
 
 var Cc = Components.classes;
