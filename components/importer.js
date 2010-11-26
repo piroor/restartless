@@ -104,6 +104,7 @@ function _createNamespace(aURISpec, aRoot)
 			location : _createFakeLocation(baseURI),
 			/** JavaScript code module style */
 			import : function(aURISpec, aExportTarget) {
+				if (!/\.jsm?$/.test(aURISpec)) aURISpec += '.js';
 				var resolved = baseURI.resolve(aURISpec);
 				if (resolved == aURISpec)
 					throw new Error('Recursive import!');
