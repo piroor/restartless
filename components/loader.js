@@ -166,6 +166,24 @@ function _callHandler(aHandler, aReason)
 	}
 }
 
+function registerResource(aName, aRoot)
+{
+	Components.classes['@mozilla.org/network/io-service;1']
+		.getService(Components.interfaces.nsIIOService)
+		.getProtocolHandler('resource')
+		.QueryInterface(Components.interfaces.nsIResProtocolHandler)
+		.setSubstitution(aName, aRoot);
+}
+
+function unregisterResource(aName)
+{
+	Components.classes['@mozilla.org/network/io-service;1']
+		.getService(Components.interfaces.nsIIOService)
+		.getProtocolHandler('resource')
+		.QueryInterface(Components.interfaces.nsIResProtocolHandler)
+		.setSubstitution(aName, null);
+}
+
 /** Handler for "install" of the bootstrap.js */
 function install(aReason)
 {

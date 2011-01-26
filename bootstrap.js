@@ -17,7 +17,7 @@
 
 var _gLoader;
 
-function _loadMain(aRoot, aReason)
+function _loadMain(aId, aRoot, aReason)
 {
 	if (_gLoader)
 		return;
@@ -25,8 +25,10 @@ function _loadMain(aRoot, aReason)
 	const IOService = Components.classes['@mozilla.org/network/io-service;1']
 						.getService(Components.interfaces.nsIIOService);
 
-	var loader, main;
+	var resource, loader, main;
 	if (aRoot.isDirectory()) {
+		resource = IOService.newFileURI(aRoot);
+
 		loader = aRoot.clone();
 		loader.append('components');
 		loader.append('loader.js');
@@ -41,12 +43,14 @@ function _loadMain(aRoot, aReason)
 		let base = 'jar:'+IOService.newFileURI(aRoot).spec+'!/';
 		loader = base + 'components/loader.js';
 		main = base + 'modules/main.js';
+		resource = IOService.newURI(base, null, null);
 	}
 
 	_gLoader = {};
 	Components.classes['@mozilla.org/moz/jssubscript-loader;1']
 		.getService(Components.interfaces.mozIJSSubScriptLoader)
 		.loadSubScript(loader, _gLoader);
+	_gLoader.registerResource(aId.split('@')[0], resource);
 	_gLoader.load(main);
 }
 
@@ -72,18 +76,19 @@ function _reasonToString(aReason)
 
 function install(aData, aReason)
 {
-	_loadMain(aData.installPath, aReason);
+	_loadMain(aData.id, aData.installPath, aReason);
 	_gLoader.install(_reasonToString(aReason));
 }
 
 function startup(aData, aReason)
 {
-	_loadMain(aData.installPath, _reasonToString(aReason));
+	_loadMain(aData.id, aData.installPath, _reasonToString(aReason));
 }
 
 function shutdown(aData, aReason)
 {
 	if (!_gLoader) return;
+	_gLoader.unregisterResource(aData.id.split('@')[0]);
 	_gLoader.shutdown(_reasonToString(aReason));
 	_gLoader = void(0);
 }

@@ -103,6 +103,8 @@ StartupService.prototype = {
 	},
 	onStartup : function()
 	{
+		this.Loader.registerResource(ADDON_ID.split('@')[0], this.IOService.newFileURI(this.root));
+
 		let main = this.root.clone();
 		main.append('modules');
 		main.append('main.js');
