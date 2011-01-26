@@ -1,11 +1,12 @@
 <body>
 	<!-- this section is recognized as e4x for loader.js -->
-	<script type="application/javascript">
+	<script type="application/javascript">//<![CDATA[
 		var event = document.createEvent('DataContainerEvent');
 		event.initEvent('OpenConfig', true, false);
 		event.setData('caller', location.href);
 		document.dispatchEvent(event);
-	</script>
+		window.setTimeout('window.close();', 0);
+	//]]></script>
 </body>
 
 /**
@@ -60,7 +61,7 @@ var config = {
 							.getService(Ci.nsIWindowWatcher)
 							.openWindow(
 								null,
-								'data:application/vnd.mozilla.xul+xml,'+escape(
+								'data:application/vnd.mozilla.xul+xml,'+encodeURIComponent(
 									'<?xml version="1.0"?>\n'+
 									'<?xml-stylesheet href="chrome://global/skin/"?>\n'+
 									current.source
@@ -135,11 +136,8 @@ var config = {
 	{
 		switch (aEvent.type)
 		{
-			case 'load':
-				let (window = aEvent.currentTarget) {
-					window.removeEventListener('load', this, false);
-					window.gBrowser.addEventListener(CONFIG_EVENT, this, true, true);
-				}
+			case 'DOMContentLoaded':
+				this._onNewWindow(aEvent.currentTarget);
 				return;
 
 			case 'unload':
@@ -147,11 +145,13 @@ var config = {
 				return;
 
 			case CONFIG_EVENT:
-				let (gBrowser = aEvent.currentTarget) {
+				let (target = aEvent.currentTarget) {
 					let uri = aEvent.getData('caller');
-					if (gBrowser.mTabContainer.childNodes.length == 1)
-						gBrowser.ownerDocument.defaultView.close();
-					this.open(uri);
+					if (uri in this._configs) {
+						if (target.mTabContainer.childNodes.length == 1)
+							target.ownerDocument.defaultView.close();
+						this.open(uri);
+					}
 				}
 				return;
 		}
@@ -160,29 +160,40 @@ var config = {
 	_onWindowUnload : function(aWindow)
 	{
 		this._windows.splice(this._windows.indexOf(aWindow), -1);
-		aWindow.removeEventListener('load', this, false);
+		aWindow.removeEventListener('DOMContentLoaded', this, false);
 		aWindow.removeEventListener('unload', this, false);
 		aWindow.gBrowser.removeEventListener(CONFIG_EVENT, this, true, true);
 	},
 
-	handleWindow : function(aWindow, aManuallyCalled)
+	_onNewWindow : function(aWindow)
 	{
-		if (aWindow.document.documentElement.getAttribute('windowtype') != TYPE_BROWSER ||
-			this._windows.indexOf(aWindow) > -1)
+		if (
+			(
+			aWindow.document.documentElement.getAttribute('windowtype') != TYPE_BROWSER &&
+			!this._isConfigWindow(aWindow) // Firefox 3.6
+			) ||
+			this._windows.indexOf(aWindow) > -1
+			)
 			return;
 
-		this._windows.push(aWindow);
-
-		if (aManuallyCalled)
+		if (this._isConfigWindow(aWindow)) { // Firefox 3.6
+			this.open(aWindow.location.href);
+		}
+		else {
+			this._windows.push(aWindow);
 			aWindow.gBrowser.addEventListener(CONFIG_EVENT, this, true, true);
-		else
-			aWindow.addEventListener('load', this, false);
-		aWindow.addEventListener('unload', this, false);
+			aWindow.addEventListener('unload', this, false);
+		}
+	},
+
+	_isConfigWindow : function(aWindow) // Firefox 3.6
+	{
+		return aWindow.location.href in this._configs;
 	}
 };
 
 WindowManager.getWindows(TYPE_BROWSER).forEach(function(aWindow) {
-	config.handleWindow(aWindow, true);
+	config._onNewWindow(aWindow, true);
 });
 WindowManager.addHandler(config);
 

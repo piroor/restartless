@@ -1,4 +1,7 @@
+try{
+dump('try to load config\n');
 load('lib/config.html');
+}catch(e){dump(e+'\n');}
 
 config.setDefault('extensions.restartless@piro.sakura.ne.jp.testBoolean', true);
 
