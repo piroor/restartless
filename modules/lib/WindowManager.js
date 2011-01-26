@@ -4,7 +4,7 @@
  * @version      1
  *
  * @license
- *   The MIT License, Copyright (c) 2010 SHIMODA "Piro" Hiroshi.
+ *   The MIT License, Copyright (c) 2010-2011 SHIMODA "Piro" Hiroshi.
  *   https://github.com/piroor/restartless/blob/master/license.txt
  * @url http://github.com/piroor/restartless
  */
@@ -19,8 +19,17 @@ var _WindowMediator = Cc['@mozilla.org/appshell/window-mediator;1']
 var _gListener = {
 		observe : function(aSubject, aTopic, aData)
 		{
-			if (String(aSubject) == '[object ChromeWindow]' &&
-				aTopic == 'domwindowopened')
+			var item = 
+			if (
+				aTopic == 'domwindowopened' &&
+				!aSubject
+					.QueryInterface(Ci.nsIInterfaceRequestor)
+					.getInterface(Ci.nsIWebNavigation)
+					.QueryInterface(Ci.nsIDocShell)
+					.QueryInterface(Ci.nsIDocShellTreeNode)
+					.QueryInterface(Ci.nsIDocShellTreeItem)
+					.parent
+				)
 				aSubject
 					.QueryInterface(Ci.nsIDOMWindow)
 					.addEventListener('DOMContentLoaded', this, false);
