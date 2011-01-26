@@ -19,7 +19,6 @@ var _WindowMediator = Cc['@mozilla.org/appshell/window-mediator;1']
 var _gListener = {
 		observe : function(aSubject, aTopic, aData)
 		{
-			var item = 
 			if (
 				aTopic == 'domwindowopened' &&
 				!aSubject
