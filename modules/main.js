@@ -15,13 +15,13 @@ dump('main.js loaded\n');
  * load() works like Components.utils.load(). EXPORTED_SYMBOLS
  * in loaded scripts are exported to the global object of this script.
  */
-load('lib/jsdeferred.js');
-load('lib/WindowManager.js');
+load('lib/jsdeferred');
+load('lib/WindowManager');
 
 /**
  * Timer sample.
  */
-var timer = require('lib/jstimer.jsm'); // CommonJS style require() also available!
+var timer = require('lib/jstimer'); // CommonJS style require() also available!
 timer.setTimeout(function() {
 	dump('DELAYED CODE DONE\n');
 }, 500);

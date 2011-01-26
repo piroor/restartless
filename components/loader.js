@@ -88,10 +88,12 @@ function _exportSymbols(aSource, aTarget)
 
 function _createNamespace(aURISpec, aRoot)
 {
-	const IOService = Components.classes['@mozilla.org/network/io-service;1']
-						.getService(Components.interfaces.nsIIOService);
+	const Cc = Components.classes;
+	const Ci = Components.interfaces;
+	const IOService = Cc['@mozilla.org/network/io-service;1']
+						.getService(Ci.nsIIOService);
 	const FileHandler = IOService.getProtocolHandler('file')
-						.QueryInterface(Components.interfaces.nsIFileProtocolHandler);
+						.QueryInterface(Ci.nsIFileProtocolHandler);
 	var baseURI = aURISpec.indexOf('file:') == 0 ?
 					IOService.newFileURI(FileHandler.getFileFromURLSpec(aURISpec)) :
 					IOService.newURI(aURISpec, null, null);
@@ -101,12 +103,36 @@ function _createNamespace(aURISpec, aRoot)
 						IOService.newURI(aRoot, null, null)
 					) :
 					aRoot ;
+	var exists = aURISpec.indexOf('jar:') == 0 ?
+					function(aPath) {
+						baseURI = baseURI.QueryInterface(Ci.nsIJARURI);
+						var reader = Cc['@mozilla.org/libjar/zip-reader;1']
+										.createInstance(Ci.nsIZipReader);
+						reader.open(baseURI.JARFile.QueryInterface(Ci.nsIFileURL).file);
+					    try {
+							let baseEntry = baseURI.JAREntry.replace(/[^\/]+$/, '');
+							let entries = reader.findEntries(baseEntry + aPath + '$');
+							let found = entries.hasMore();
+							return found;
+						}
+						finally {
+							reader.close();
+						}
+					} :
+					function(aPath) {
+						return FileHandler.getFileFromURLSpec(baseURI.resolve(aPath)).exists();
+					}
 	var ns = {
 			__proto__ : _namespacePrototype,
 			location : _createFakeLocation(baseURI),
 			/** JavaScript code module style */
 			load : function(aURISpec, aExportTarget) {
-				if (!/\.jsm?$/.test(aURISpec)) aURISpec += '.js';
+				if (!/\.jsm?$/.test(aURISpec)) {
+					if (exists(aURISpec+'.js'))
+						aURISpec += '.js'
+					else if (exists(aURISpec+'.jsm'))
+						aURISpec += '.jsm'
+				}
 				var resolved = baseURI.resolve(aURISpec);
 				if (resolved == aURISpec)
 					throw new Error('Recursive load!');
@@ -117,7 +143,12 @@ function _createNamespace(aURISpec, aRoot)
 			 * @url http://www.commonjs.org/specs/
 			 */
 			require : function(aURISpec) {
-				if (!/\.jsm?$/.test(aURISpec)) aURISpec += '.js';
+				if (!/\.jsm?$/.test(aURISpec)) {
+					if (exists(aURISpec+'.js'))
+						aURISpec += '.js'
+					else if (exists(aURISpec+'.jsm'))
+						aURISpec += '.jsm'
+				}
 				var resolved = (aURISpec.charAt(0) == '.' ? rootURI : baseURI ).resolve(aURISpec);
 				if (resolved == aURISpec)
 					throw new Error('Recursive load!');
