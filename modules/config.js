@@ -14,7 +14,7 @@ config.register('resource://restartless/modules/lib/config.html', <>
 
 	<prefpane id="prefpane-general" label="general">
 		<preferences>
-			<preference id="extensions.restartless@piro.sakura.ne.jp.testBoolean"
+			<preference id="testBoolean"
 				name="extensions.restartless@piro.sakura.ne.jp.testBoolean"
 				type="bool"/>
 		</preferences>
@@ -22,7 +22,7 @@ config.register('resource://restartless/modules/lib/config.html', <>
 
 		<checkbox id="testBoolean-checkbox"
 			label={bundle.getString('config.testBoolean')}
-			preference="extensions.restartless@piro.sakura.ne.jp.testBoolean"/>
+			preference="testBoolean"/>
 
 	</prefpane>
 
