@@ -18,7 +18,7 @@ const Cc = Components.classes;
 const Ci = Components.interfaces;
 const Cu = Components.utils;
 
-Cu.load('resource://gre/modules/XPCOMUtils.jsm');
+Cu.import('resource://gre/modules/XPCOMUtils.jsm');
 
 /**
  * This component provides ability to load/unload main code of restartless
@@ -58,10 +58,10 @@ StartupService.prototype = {
 			(this._IOService = Cc['@mozilla.org/network/io-service;1']
 									.getService(Ci.nsIIOService));
 	},
-	get Loader()
+	get JSLoader()
 	{
-		return this._Loader ||
-			(this._Loader = Cc['@mozilla.org/moz/jssubscript-loader;1']
+		return this._JSLoader ||
+			(this._JSLoader = Cc['@mozilla.org/moz/jssubscript-loader;1']
 									.getService(Ci.mozIJSSubScriptLoader));
 	},
 	get Loader()
@@ -71,7 +71,7 @@ StartupService.prototype = {
 			let loader = this.root.clone();
 			loader.append('components');
 			loader.append('loader.js');
-			this.Loader.loadSubScript(this.IOService.newFileURI(loader).spec, this._Loader);
+			this.JSLoader.loadSubScript(this.IOService.newFileURI(loader).spec, this._Loader);
 		}
 		return this._Loader;
 	},
