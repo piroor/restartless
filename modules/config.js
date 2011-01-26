@@ -8,7 +8,7 @@ var bundle = require('lib/locale')
 
 config.register('resource://restartless/modules/lib/config.html', <>
 
-<prefwindow id="treestyletab-config"
+<prefwindow id="restartless-config"
 	xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
 	title={bundle.getString('config.title')}>
 
