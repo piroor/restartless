@@ -1,15 +1,15 @@
 /**
- * @fileOverview Importer module for restartless addons
+ * @fileOverview Loader module for restartless addons
  * @author       SHIMODA "Piro" Hiroshi
  * @version      1
  *
  * @license
- *   The MIT License, Copyright (c) 2010 SHIMODA "Piro" Hiroshi.
+ *   The MIT License, Copyright (c) 2010-2011 SHIMODA "Piro" Hiroshi.
  *   https://github.com/piroor/restartless/blob/master/license.txt
  * @url http://github.com/piroor/restartless
  */
 
-/** You can customize shared properties for imported scripts. */
+/** You can customize shared properties for loaded scripts. */
 var _namespacePrototype = {
 		Cc : Components.classes,
 		Ci : Components.interfaces,
@@ -21,22 +21,24 @@ var _namespacePrototype = {
 var _namespaces;
 
 /**
- * This functiom imports specified script into a unique namespace for the URL.
- * Namespaces for imported scripts have a wrapped version of this function.
+ * This functiom loads specified script into a unique namespace for the URL.
+ * Namespaces for loaded scripts have a wrapped version of this function.
  * Both this and wrapped work like as Components.utils.import().
+ * Due to the reserved symbol "import", we have to use another name "load"
+ * instead it.
  *
  * @param {String} aScriptURL
- *   URL of a script. Wrapped version of import() can handle related path.
+ *   URL of a script. Wrapped version of load() can handle related path.
  *   Related path will be resolved based on the location of the caller script.
  * @param {Object=} aExportTarget
- *   EXPORTED_SYMBOLS in the imported script will be exported to the object.
+ *   EXPORTED_SYMBOLS in the loaded script will be exported to the object.
  *   If no object is specified, symbols will be exported to the global object
  *   of the caller.
  *
  * @returns {Object}
- *   The global object for the imported script.
+ *   The global object for the loaded script.
  */
-function import(aURISpec, aExportTarget, aRoot)
+function load(aURISpec, aExportTarget, aRoot)
 {
 	if (!_namespaces)
 		_namespaces = {};
@@ -103,12 +105,12 @@ function _createNamespace(aURISpec, aRoot)
 			__proto__ : _namespacePrototype,
 			location : _createFakeLocation(baseURI),
 			/** JavaScript code module style */
-			import : function(aURISpec, aExportTarget) {
+			load : function(aURISpec, aExportTarget) {
 				if (!/\.jsm?$/.test(aURISpec)) aURISpec += '.js';
 				var resolved = baseURI.resolve(aURISpec);
 				if (resolved == aURISpec)
-					throw new Error('Recursive import!');
-				return import(resolved, aExportTarget || ns, rootURI);
+					throw new Error('Recursive load!');
+				return load(resolved, aExportTarget || ns, rootURI);
 			},
 			/**
 			 * CommonJS style
@@ -118,9 +120,9 @@ function _createNamespace(aURISpec, aRoot)
 				if (!/\.jsm?$/.test(aURISpec)) aURISpec += '.js';
 				var resolved = (aURISpec.charAt(0) == '.' ? rootURI : baseURI ).resolve(aURISpec);
 				if (resolved == aURISpec)
-					throw new Error('Recursive import!');
+					throw new Error('Recursive load!');
 				var exported = {};
-				import(resolved, exported, rootURI);
+				load(resolved, exported, rootURI);
 				return exported;
 			},
 			exports : {}
@@ -182,7 +184,7 @@ function shutdown(aReason)
 	_callHandler('shutdown', aReason);
 	_namespaces = void(0);
 
-	import = void(0);
+	load = void(0);
 	_exportSymbols = void(0);
 	_createNamespace = void(0);
 	_callHandler = void(0);

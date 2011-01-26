@@ -12,11 +12,11 @@
 dump('main.js loaded\n');
 
 /**
- * import() works like Components.utils.import(). EXPORTED_SYMBOLS
- * in imported scripts are exported to the global object of this script.
+ * load() works like Components.utils.load(). EXPORTED_SYMBOLS
+ * in loaded scripts are exported to the global object of this script.
  */
-import('lib/jsdeferred.js');
-import('lib/WindowManager.js');
+load('lib/jsdeferred.js');
+load('lib/WindowManager.js');
 
 /**
  * Timer sample.
@@ -83,7 +83,7 @@ function shutdown()
 		label.parentNode.removeChild(label);
 	});
 
-	// free imported symbols
+	// free loaded symbols
 	Deferred = void(0);
 	WindowManager = void(0);
 	timer = void(0);

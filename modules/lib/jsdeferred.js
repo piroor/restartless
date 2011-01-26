@@ -3,7 +3,7 @@ var window = {};
 var location = { protocol: 'resource:' };
 var document = { addEventListener : function() {} };
 
-import('jstimer.jsm', window);
+load('jstimer.jsm', window);
 var setTimeout    = window.setTimeout;
 var clearTimeout  = window.clearTimeout;
 var setInterval   = window.setInterval;

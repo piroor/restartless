@@ -5,32 +5,32 @@
  *
  * @description
  *   This provides ability to load a script file placed to "modules/main.js".
- *   Functions named "shutdown", defined in main.js and any imported script
+ *   Functions named "shutdown", defined in main.js and any loaded script
  *   will be called when the addon is disabled or uninstalled (include
  *   updating).
  *
  * @license
- *   The MIT License, Copyright (c) 2010 SHIMODA "Piro" Hiroshi.
+ *   The MIT License, Copyright (c) 2010-2011 SHIMODA "Piro" Hiroshi.
  *   https://github.com/piroor/restartless/blob/master/license.txt
  * @url http://github.com/piroor/restartless
  */
 
-var _gImporter;
+var _gLoader;
 
 function _loadMain(aRoot, aReason)
 {
-	if (_gImporter)
+	if (_gLoader)
 		return;
 
 	const IOService = Components.classes['@mozilla.org/network/io-service;1']
 						.getService(Components.interfaces.nsIIOService);
 
-	var importer, main;
+	var loader, main;
 	if (aRoot.isDirectory()) {
-		importer = aRoot.clone();
-		importer.append('components');
-		importer.append('importer.js');
-		importer = IOService.newFileURI(importer).spec;
+		loader = aRoot.clone();
+		loader.append('components');
+		loader.append('loader.js');
+		loader = IOService.newFileURI(loader).spec;
 
 		main = aRoot.clone();
 		main.append('modules');
@@ -39,15 +39,15 @@ function _loadMain(aRoot, aReason)
 	}
 	else {
 		let base = 'jar:'+IOService.newFileURI(aRoot).spec+'!/';
-		importer = base + 'components/importer.js';
+		loader = base + 'components/loader.js';
 		main = base + 'modules/main.js';
 	}
 
-	_gImporter = {};
+	_gLoader = {};
 	Components.classes['@mozilla.org/moz/jssubscript-loader;1']
 		.getService(Components.interfaces.mozIJSSubScriptLoader)
-		.loadSubScript(importer, _gImporter);
-	_gImporter.import(main);
+		.loadSubScript(loader, _gLoader);
+	_gLoader.load(main);
 }
 
 function _reasonToString(aReason)
@@ -73,7 +73,7 @@ function _reasonToString(aReason)
 function install(aData, aReason)
 {
 	_loadMain(aData.installPath, aReason);
-	_gImporter.install(_reasonToString(aReason));
+	_gLoader.install(_reasonToString(aReason));
 }
 
 function startup(aData, aReason)
@@ -83,14 +83,14 @@ function startup(aData, aReason)
 
 function shutdown(aData, aReason)
 {
-	if (!_gImporter) return;
-	_gImporter.shutdown(_reasonToString(aReason));
-	_gImporter = void(0);
+	if (!_gLoader) return;
+	_gLoader.shutdown(_reasonToString(aReason));
+	_gLoader = void(0);
 }
 
 function uninstall(aData, aReason)
 {
-	if (!_gImporter) return;
-	_gImporter.uninstall(_reasonToString(aReason));
-	_gImporter = void(0);
+	if (!_gLoader) return;
+	_gLoader.uninstall(_reasonToString(aReason));
+	_gLoader = void(0);
 }
