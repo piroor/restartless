@@ -17,6 +17,7 @@ dump('main.js loaded\n');
  */
 load('lib/jsdeferred');
 load('lib/WindowManager');
+load('config');
 
 /**
  * Timer sample.

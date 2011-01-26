@@ -1,1 +1,4 @@
 message=ローカライズ済みのメッセージです。
+
+config.title=設定ダイアログ
+config.testBoolean=真偽値の設定

@@ -9,6 +9,7 @@
                    em:creator="SHIMODA Hiroshi"
                    em:description="A template for restartless addons."
                    em:homepageURL=""
+                   em:optionsURL="resource://restartless/modules/lib/config.html"
                    em:bootstrap="true">
 
     <em:updateURL></em:updateURL>
