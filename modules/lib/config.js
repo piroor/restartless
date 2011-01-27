@@ -1,7 +1,7 @@
 /**
  * @fileOverview Configuration dialog module for restartless addons
  * @author       SHIMODA "Piro" Hiroshi
- * @version      2
+ * @version      3
  *
  * @license
  *   The MIT License, Copyright (c) 2011 SHIMODA "Piro" Hiroshi.
@@ -126,33 +126,20 @@ var config = {
 
 	observe : function(aSubject, aTopic, aData)
 	{
-		var uri = this._resolveResURI(aSubject.location.href);
-		if (!(uri in this._configs))
+		var uri = aSubject.location.href;
+		if (
+			uri == 'about:addons' ||
+			uri == 'chrome://mozapps/content/extensions/extensions.xul' // Firefox 3.6
+			) {
+			this._onLoadManager(aSubject);
 			return;
-		var parent = aSubject.top
-						.QueryInterface(Ci.nsIInterfaceRequestor)
-						.getInterface(Ci.nsIWebNavigation)
-						.QueryInterface(Ci.nsIDocShell)
-						.QueryInterface(Ci.nsIDocShellTreeNode)
-						.QueryInterface(Ci.nsIDocShellTreeItem)
-						.parent;
-		if (parent) {
-			parent = parent
-						.QueryInterface(Ci.nsIWebNavigation)
-						.document
-						.defaultView;
-			if (
-				!parent.gBrowser ||
-				parent.gBrowser.mTabContainer.childNodes.length == 1
-				)
-				parent.setTimeout('window.close();', 0);
-			else
-				aSubject.setTimeout('window.close();', 0);
 		}
-		else {
+
+		uri = this._resolveResURI(uri);
+		if (uri in this._configs) {
 			aSubject.setTimeout('window.close();', 0);
+			this.open(uri);
 		}
-		this.open(uri);
 	},
 
 	_resolveResURI : function(aURI)
@@ -160,7 +147,47 @@ var config = {
 		if (aURI.indexOf('resource:') == 0)
 			return ResProtocolHandler.resolveURI(IOService.newURI(aURI, null, null));
 		return aURI;
-	}
+	},
+
+	handleEvent : function(aEvent)
+	{
+		switch (aEvent.type)
+		{
+			case 'unload':
+				this._onUnloadManager(aEvent.currentTarget);
+				return;
+
+			case 'command':
+				let target = aEvent.originalTarget;
+				let uri;
+				if (target.getAttribute('anonid') == 'preferences-btn')
+					uri = aEvent.target.mAddon.optionsURL;
+				else if (target.id == 'cmd_options') // Firefox 3.6
+					uri = target.ownerDocument.defaultView
+							.gExtensionsView.currentItem.getAttribute('optionsURL');
+				if (uri &&
+					(uri = this._resolveResURI(uri)) &&
+					uri in this._configs) {
+					this.open(uri);
+					aEvent.stopPropagation();
+					aEvent.preventDefault();
+				}
+				return;
+		}
+	},
+	_onLoadManager : function(aWindow)
+	{
+		aWindow.addEventListener('command', this, true);
+		aWindow.addEventListener('unload', this, true);
+		this._managers.push(aWindow);
+	},
+	_onUnloadManager : function(aWindow)
+	{
+		aWindow.removeEventListener('command', this, true);
+		aWindow.removeEventListener('unload', this, true);
+		this._managers.splice(this._managers.indexOf(aWindow), 1);
+	},
+	_managers : []
 };
 
 var Prefs = Cc['@mozilla.org/preferences;1']
@@ -180,17 +207,32 @@ var ObserverService = Cc['@mozilla.org/observer-service;1']
 ObserverService.addObserver(config, 'chrome-document-global-created', false);
 ObserverService.addObserver(config, 'content-document-global-created', false);
 
+var WindowMediator = Cc['@mozilla.org/appshell/window-mediator;1']
+						.getService(Ci.nsIWindowMediator)
+let (managers = WindowMediator.getEnumerator('Addons:Manager')) {
+	while (managers.hasMoreElements())
+	{
+		config._onLoadManager(managers.getNext().QueryInterface(Ci.nsIDOMWindow));
+	}
+}
+let (managers = WindowMediator.getEnumerator('Extension:Manager')) { // Firefox 3.6
+	while (managers.hasMoreElements())
+	{
+		config._onLoadManager(managers.getNext().QueryInterface(Ci.nsIDOMWindow));
+	}
+}
+
 function shutdown()
 {
-	var windows = Cc['@mozilla.org/appshell/window-mediator;1']
-					.getService(Ci.nsIWindowMediator)
-					.getEnumerator(null);
+	var windows = WindowMediator.getEnumerator(null);
 	while (windows.hasMoreElements())
 	{
 		let window = windows.getNext().QueryInterface(Ci.nsIDOMWindow);
 		if (window._sourceURI && window._sourceURI in config._configs)
 			window.close();
 	}
+
+	config._managers.forEach(config._onUnloadManager, config);
 
 	ObserverService.removeObserver(config, 'chrome-document-global-created');
 	ObserverService.removeObserver(config, 'content-document-global-created');
@@ -200,7 +242,9 @@ function shutdown()
 	ObserverService = void(0);
 	IOService = void(0);
 	ResProtocolHandler = void(0);
+	WindowMediator = void(0);
 
 	config._configs = void(0);
+	config._managers = void(0);
 	config = void(0);
 }
