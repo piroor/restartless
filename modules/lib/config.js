@@ -1,18 +1,7 @@
-<body>
-	<!-- this section is recognized as e4x for loader.js -->
-	<script type="application/javascript">//<![CDATA[
-		var event = document.createEvent('DataContainerEvent');
-		event.initEvent('OpenConfig', true, false);
-		event.setData('caller', location.href);
-		document.dispatchEvent(event);
-		window.setTimeout('window.close();', 0);
-	//]]></script>
-</body>
-
 /**
  * @fileOverview Configuration dialog module for restartless addons
  * @author       SHIMODA "Piro" Hiroshi
- * @version      1
+ * @version      2
  *
  * @license
  *   The MIT License, Copyright (c) 2011 SHIMODA "Piro" Hiroshi.
@@ -25,15 +14,12 @@ load('prefs');
 
 const EXPORTED_SYMBOLS = ['config'];
 
-const CONFIG_EVENT = 'OpenConfig';
-const TYPE_BROWSER = 'navigator:browser';
-
 /**
  * @class
  *   Provides features to manage custom configuration dialog.
  */
 var config = {
-	_configs : [],
+	_configs : {},
 
 	/**
 	 * Opens a registered dialog bound to the given URI as a "non-modal"
@@ -130,84 +116,32 @@ var config = {
 		prefs.setDefaultPref(aKey, aValue);
 	},
 
-
-	_windows : [],
-
-	handleEvent : function(aEvent)
+	observe : function(aSubject, aTopic, aData)
 	{
-		switch (aEvent.type)
-		{
-			case 'DOMContentLoaded':
-				this._onNewWindow(aEvent.currentTarget);
-				return;
-
-			case 'unload':
-				this._onWindowUnload(aEvent.currentTarget);
-				return;
-
-			case CONFIG_EVENT:
-				let (target = aEvent.currentTarget) {
-					let uri = aEvent.getData('caller');
-					if (uri in this._configs) {
-						if (target.mTabContainer.childNodes.length == 1)
-							target.ownerDocument.defaultView.close();
-						this.open(uri);
-					}
-				}
-				return;
+		if (aSubject.location.href in this._configs) {
+			aSubject.setTimeout('window.close();', 0);
+			this.open(aSubject.location.href);
 		}
-	},
-
-	_onWindowUnload : function(aWindow)
-	{
-		this._windows.splice(this._windows.indexOf(aWindow), -1);
-		aWindow.removeEventListener('DOMContentLoaded', this, false);
-		aWindow.removeEventListener('unload', this, false);
-		aWindow.gBrowser.removeEventListener(CONFIG_EVENT, this, true, true);
-	},
-
-	_onNewWindow : function(aWindow)
-	{
-		if (
-			(
-			aWindow.document.documentElement.getAttribute('windowtype') != TYPE_BROWSER &&
-			!this._isConfigWindow(aWindow) // Firefox 3.6
-			) ||
-			this._windows.indexOf(aWindow) > -1
-			)
-			return;
-
-		if (this._isConfigWindow(aWindow)) { // Firefox 3.6
-			this.open(aWindow.location.href);
-		}
-		else {
-			this._windows.push(aWindow);
-			aWindow.gBrowser.addEventListener(CONFIG_EVENT, this, true, true);
-			aWindow.addEventListener('unload', this, false);
-		}
-	},
-
-	_isConfigWindow : function(aWindow) // Firefox 3.6
-	{
-		return aWindow.location.href in this._configs;
 	}
 };
 
-WindowManager.getWindows(TYPE_BROWSER).forEach(function(aWindow) {
-	config._onNewWindow(aWindow, true);
-});
-WindowManager.addHandler(config);
+var ObserverService = Cc['@mozilla.org/observer-service;1']
+						.getService(Ci.nsIObserverService);
+ObserverService.addObserver(config, 'chrome-document-global-created', false);
+ObserverService.addObserver(config, 'content-document-global-created', false);
 
 function shutdown()
 {
 	WindowManager.getWindows(null).forEach(function(aWindow) {
-		if (aWindow.document.documentElement.getAttribute('windowtype') == TYPE_BROWSER)
-			config._onWindowUnload(aWindow);
-		else if (aWindow._sourceURI && aWindow._sourceURI in config._configs)
+		if (aWindow._sourceURI && aWindow._sourceURI in config._configs)
 			aWindow.close();
 	});
+	ObserverService.removeObserver(config, 'chrome-document-global-created');
+	ObserverService.removeObserver(config, 'content-document-global-created');
+
 	WindowManager = void(0);
 	config._configs = void(0);
 	config._windows = void(0);
 	config = void(0);
 }
+

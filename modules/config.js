@@ -1,11 +1,11 @@
-load('lib/config.html');
+load('lib/config');
 
 config.setDefault('extensions.restartless@piro.sakura.ne.jp.testBoolean', true);
 
 var bundle = require('lib/locale')
 				.get('locale/messages.properties', location.href);
 
-config.register('resource://restartless/modules/lib/config.html', <>
+config.register('resource://restartless/config', <>
 
 <prefwindow id="restartless-config"
 	xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
