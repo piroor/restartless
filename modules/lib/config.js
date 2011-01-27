@@ -184,7 +184,7 @@ function shutdown()
 {
 	var windows = Cc['@mozilla.org/appshell/window-mediator;1']
 					.getService(Ci.nsIWindowMediator)
-					getEnumerator(null);
+					.getEnumerator(null);
 	while (windows.hasMoreElements())
 	{
 		let window = windows.getNext().QueryInterface(Ci.nsIDOMWindow);
@@ -202,6 +202,5 @@ function shutdown()
 	ResProtocolHandler = void(0);
 
 	config._configs = void(0);
-	config._windows = void(0);
 	config = void(0);
 }
