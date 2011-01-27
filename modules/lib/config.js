@@ -9,9 +9,6 @@
  * @url http://www.cozmixng.org/repos/piro/restartless-addon/trunk/
  */
 
-load('WindowManager');
-load('prefs');
-
 const EXPORTED_SYMBOLS = ['config'];
 
 /**
@@ -55,7 +52,7 @@ var config = {
 								),
 								'_blank',
 								'chrome,titlebar,toolbar,centerscreen' +
-								(prefs.getPref('browser.preferences.instantApply') ?
+								(Prefs.getBoolPref('browser.preferences.instantApply') ?
 									',dialog=no' :
 									''// ',modal'
 								),
@@ -114,7 +111,17 @@ var config = {
 	 */
 	setDefault : function(aKey, aValue)
 	{
-		prefs.setDefaultPref(aKey, aValue);
+		switch (typeof aValue)
+		{
+			case 'string':
+				return DefaultPrefs.setCharPref(aKey, unescape(encodeURIComponent(aValue)));
+
+			case 'number':
+				return DefaultPrefs.setIntPref(aKey, parseInt(aValue));
+
+			default:
+				return DefaultPrefs.setBoolPref(aKey, !!aValue);
+		}
 	},
 
 	observe : function(aSubject, aTopic, aData)
@@ -168,6 +175,11 @@ var config = {
 	}
 };
 
+var Prefs = Cc['@mozilla.org/preferences;1']
+						.getService(Ci.nsIPrefBranch);
+var DefaultPrefs = Cc['@mozilla.org/preferences-service;1']
+						.getService(Ci.nsIPrefService)
+						.getDefaultBranch(null);
 
 var IOService = Cc['@mozilla.org/network/io-service;1']
 						.getService(Ci.nsIIOService);
@@ -182,18 +194,25 @@ ObserverService.addObserver(config, 'content-document-global-created', false);
 
 function shutdown()
 {
-	WindowManager.getWindows(null).forEach(function(aWindow) {
-		if (aWindow._sourceURI && aWindow._sourceURI in config._configs)
-			aWindow.close();
-	});
+	var windows = Cc['@mozilla.org/appshell/window-mediator;1']
+					.getService(Ci.nsIWindowMediator)
+					getEnumerator(null);
+	while (windows.hasMoreElements())
+	{
+		let window = windows.getNext().QueryInterface(Ci.nsIDOMWindow);
+		if (window._sourceURI && window._sourceURI in config._configs)
+			window.close();
+	}
+
 	ObserverService.removeObserver(config, 'chrome-document-global-created');
 	ObserverService.removeObserver(config, 'content-document-global-created');
 
+	Prefs = void(0);
+	DefaultPrefs = void(0);
 	ObserverService = void(0);
 	IOService = void(0);
 	ResProtocolHandler = void(0);
 
-	WindowManager = void(0);
 	config._configs = void(0);
 	config._windows = void(0);
 	config = void(0);
