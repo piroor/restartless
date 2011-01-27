@@ -20,11 +20,14 @@ var get = function(aPath, aBaseURI) {
 
 		var locale = DEFAULT_LOCALE;
 		try {
-			locale = Cc['@mozilla.org/preferences;1']
-						.getService(Ci.nsIPrefBranch)
-						.getCharPref('general.useragent.locale') || DEFAULT_LOCALE;
+			let prefs = Cc['@mozilla.org/preferences;1'].getService(Ci.nsIPrefBranch);
+			locale = prefs.getCharPref('general.useragent.locale');
+			if (/\w+:/.test(locale))
+				locale = prefs.getComplexValue('general.useragent.locale', Ci.nsIPrefLocalizedString).data;
+			locale = locale || DEFAULT_LOCALE;
 		}
 		catch(e) {
+		dump(e+'\n');
 		}
 		var uri = aPath;
 		[
