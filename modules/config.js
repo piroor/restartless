@@ -3,8 +3,7 @@ load('lib/config.html');
 config.setDefault('extensions.restartless@piro.sakura.ne.jp.testBoolean', true);
 
 var bundle = require('lib/locale')
-				.get(location.href.replace(/[^\/]+$/, '')+
-						'locale/messages.properties');
+				.get('locale/messages.properties', location.href);
 
 config.register('resource://restartless/modules/lib/config.html', <>
 

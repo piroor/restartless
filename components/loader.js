@@ -1,7 +1,7 @@
 /**
  * @fileOverview Loader module for restartless addons
  * @author       SHIMODA "Piro" Hiroshi
- * @version      1
+ * @version      2
  *
  * @license
  *   The MIT License, Copyright (c) 2010-2011 SHIMODA "Piro" Hiroshi.
@@ -86,14 +86,56 @@ function _exportSymbols(aSource, aTarget)
 	}
 }
 
+var IOService = Components.classes['@mozilla.org/network/io-service;1']
+					.getService(Components.interfaces.nsIIOService);
+var FileHandler = IOService.getProtocolHandler('file')
+					.QueryInterface(Components.interfaces.nsIFileProtocolHandler);
+
+/**
+ * Checks existence of the file specified by the given relative path and the base URI.
+ *
+ * @param {String} aPath
+ *   A relative path to a file or directory, from the aBaseURI.
+ * @param {String} aBaseURI
+ *   An absolute URI (with scheme) for relative paths.
+ *
+ * @returns {String}
+ *   If the file (or directory) exists, returns the absolute URI. Otherwise null.
+ */
+function exists(aPath, aBaseURI)
+{
+	if (/^\w+:/.test(aPath)) {
+		let leafName = aPath.match(/([^\/]+)$/);
+		leafName = leafName ? leafName[1] : '' ;
+		aBaseURI = aPath.replace(/(?:[^\/]+)$/, '');
+		aPath = leafName;
+	}
+	var baseURI = aBaseURI.indexOf('file:') == 0 ?
+					IOService.newFileURI(FileHandler.getFileFromURLSpec(aBaseURI)) :
+					IOService.newURI(aBaseURI, null, null);
+	if (aBaseURI.indexOf('jar:') == 0) {
+		baseURI = baseURI.QueryInterface(Components.interfaces.nsIJARURI);
+		var reader = Components.classes['@mozilla.org/libjar/zip-reader;1']
+						.createInstance(Components.interfaces.nsIZipReader);
+		reader.open(baseURI.JARFile.QueryInterface(Components.interfaces.nsIFileURL).file);
+	    try {
+			let baseEntry = baseURI.JAREntry.replace(/[^\/]+$/, '');
+			let entries = reader.findEntries(baseEntry + aPath + '$');
+			let found = entries.hasMore();
+			return found ? baseURI.resolve(aPath) : null ;
+		}
+		finally {
+			reader.close();
+		}
+	}
+	else {
+		let resolved = baseURI.resolve(aPath);
+		return FileHandler.getFileFromURLSpec(resolved).exists() ? resolved : null ;
+	}
+}
+
 function _createNamespace(aURISpec, aRoot)
 {
-	const Cc = Components.classes;
-	const Ci = Components.interfaces;
-	const IOService = Cc['@mozilla.org/network/io-service;1']
-						.getService(Ci.nsIIOService);
-	const FileHandler = IOService.getProtocolHandler('file')
-						.QueryInterface(Ci.nsIFileProtocolHandler);
 	var baseURI = aURISpec.indexOf('file:') == 0 ?
 					IOService.newFileURI(FileHandler.getFileFromURLSpec(aURISpec)) :
 					IOService.newURI(aURISpec, null, null);
@@ -103,34 +145,21 @@ function _createNamespace(aURISpec, aRoot)
 						IOService.newURI(aRoot, null, null)
 					) :
 					aRoot ;
-	var exists = aURISpec.indexOf('jar:') == 0 ?
-					function(aPath) {
-						baseURI = baseURI.QueryInterface(Ci.nsIJARURI);
-						var reader = Cc['@mozilla.org/libjar/zip-reader;1']
-										.createInstance(Ci.nsIZipReader);
-						reader.open(baseURI.JARFile.QueryInterface(Ci.nsIFileURL).file);
-					    try {
-							let baseEntry = baseURI.JAREntry.replace(/[^\/]+$/, '');
-							let entries = reader.findEntries(baseEntry + aPath + '$');
-							let found = entries.hasMore();
-							return found;
-						}
-						finally {
-							reader.close();
-						}
-					} :
-					function(aPath) {
-						return FileHandler.getFileFromURLSpec(baseURI.resolve(aPath)).exists();
-					}
 	var ns = {
 			__proto__ : _namespacePrototype,
 			location : _createFakeLocation(baseURI),
+			exists : function(aPath, aBase) {
+				return exists(aPath, aBase || baseURI.spec);
+			}, 
+			exist : function(aPath, aBase) { // alias
+				return exists(aPath, aBase || baseURI.spec);
+			}, 
 			/** JavaScript code module style */
 			load : function(aURISpec, aExportTarget) {
 				if (!/\.jsm?$/.test(aURISpec)) {
-					if (exists(aURISpec+'.js'))
+					if (exists(aURISpec+'.js', baseURI.spec))
 						aURISpec += '.js'
-					else if (exists(aURISpec+'.jsm'))
+					else if (exists(aURISpec+'.jsm', baseURI.spec))
 						aURISpec += '.jsm'
 				}
 				var resolved = baseURI.resolve(aURISpec);
@@ -144,9 +173,9 @@ function _createNamespace(aURISpec, aRoot)
 			 */
 			require : function(aURISpec) {
 				if (!/\.jsm?$/.test(aURISpec)) {
-					if (exists(aURISpec+'.js'))
+					if (exists(aURISpec+'.js', baseURI.spec))
 						aURISpec += '.js'
-					else if (exists(aURISpec+'.jsm'))
+					else if (exists(aURISpec+'.jsm', baseURI.spec))
 						aURISpec += '.jsm'
 				}
 				var resolved = (aURISpec.charAt(0) == '.' ? rootURI : baseURI ).resolve(aURISpec);
@@ -199,18 +228,14 @@ function _callHandler(aHandler, aReason)
 
 function registerResource(aName, aRoot)
 {
-	Components.classes['@mozilla.org/network/io-service;1']
-		.getService(Components.interfaces.nsIIOService)
-		.getProtocolHandler('resource')
+	IOService.getProtocolHandler('resource')
 		.QueryInterface(Components.interfaces.nsIResProtocolHandler)
 		.setSubstitution(aName, aRoot);
 }
 
 function unregisterResource(aName)
 {
-	Components.classes['@mozilla.org/network/io-service;1']
-		.getService(Components.interfaces.nsIIOService)
-		.getProtocolHandler('resource')
+	IOService.getProtocolHandler('resource')
 		.QueryInterface(Components.interfaces.nsIResProtocolHandler)
 		.setSubstitution(aName, null);
 }
@@ -233,10 +258,16 @@ function shutdown(aReason)
 	_callHandler('shutdown', aReason);
 	_namespaces = void(0);
 
+	IOService = void(0);
+	FileHandler = void(0);
+
 	load = void(0);
 	_exportSymbols = void(0);
+	exists = void(0);
 	_createNamespace = void(0);
 	_callHandler = void(0);
+	registerResource = void(0);
+	unregisterResource = void(0);
 	install = void(0);
 	uninstall = void(0);
 	shutdown = void(0);

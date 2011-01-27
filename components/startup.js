@@ -1,7 +1,7 @@
 /**
  * @fileOverview Startup service for restartless addons, for Gecko 1.9.x
  * @author       SHIMODA "Piro" Hiroshi
- * @version      1
+ * @version      2
  *
  * @license
  *   The MIT License, Copyright (c) 2010-2011 SHIMODA "Piro" Hiroshi.

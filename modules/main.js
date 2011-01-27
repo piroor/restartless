@@ -38,8 +38,7 @@ Deferred.next(function() {
  * Localized messages sample.
  */
 var bundle = require('lib/locale')
-				.get(location.href.replace(/[^\/]+$/, '')+
-						'locale/messages.properties');
+				.get('locale/messages.properties', location.href);
 dump(bundle.getString('message')+'\n');
 
 
