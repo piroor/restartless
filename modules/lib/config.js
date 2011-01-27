@@ -41,14 +41,18 @@ var config = {
 			return current.openedWindow;
 		}
 
+		var contents = Cc['@mozilla.org/variant;1'].createInstance(Ci.nsIWritableVariant);
+		contents.setFromVariant(current.content);
+
 		current.openedWindow = Cc['@mozilla.org/embedcomp/window-watcher;1']
 							.getService(Ci.nsIWindowWatcher)
 							.openWindow(
 								null,
 								'data:application/vnd.mozilla.xul+xml,'+encodeURIComponent(
 									'<?xml version="1.0"?>\n'+
+									'<!-- ' + current.originalURI + ' -->\n'+
 									'<?xml-stylesheet href="chrome://global/skin/"?>\n'+
-									current.source
+									current.container
 								),
 								'_blank',
 								'chrome,titlebar,toolbar,centerscreen' +
@@ -56,7 +60,7 @@ var config = {
 									',dialog=no' :
 									''// ',modal'
 								),
-								null
+								contents
 							);
 		current.openedWindow.addEventListener('load', function() {
 			current.openedWindow.removeEventListener('load', arguments.callee, false);
@@ -77,15 +81,27 @@ var config = {
 	 *   A URI which is the target URI. When the URI is loaded in a browser
 	 *   window, then this system automatically opens a generated XUL window
 	 *   from the source.
-	 * @param {String} aSource
-	 *   A source code of a XUL document for a configuration dialog. Typical
-	 *   headers (<?xml version="1.0"?> and an <?xml-stylesheet?> for the
-	 *   default theme) are automatically added.
+	 * @param {XML} aXML
+	 *   A source of a XUL document for a configuration dialog defined as an
+	 *   E4X object (XML object). Typical headers (<?xml version="1.0"?> and
+	 *   an <?xml-stylesheet?> for the default theme) are automatically added.
 	 */
-	register : function(aURI, aSource)
+	register : function(aURI, aXML)
 	{
+		var content = aXML.*;
+		var container = aXML.copy();
+		delete container.*;
+		container.script = <script type="application/javascript"><![CDATA[
+			var range = document.createRange();
+			range.selectNodeContents(document.documentElement);
+			range.collapse(true);
+			document.documentElement.appendChild(range.createContextualFragment(arguments[0]));
+			range.detach();
+		]]></script>;
 		this._configs[this._resolveResURI(aURI)] = {
-			source       : aSource,
+			originalURI  : aURI,
+			content      : content.toXMLString(),
+			container    : container.toString(),
 			openedWindow : null
 		};
 	},

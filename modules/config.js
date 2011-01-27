@@ -27,4 +27,4 @@ config.register('resource://restartless/config', <>
 
 </prefwindow>
 
-</>.toXMLString());
+</>);
