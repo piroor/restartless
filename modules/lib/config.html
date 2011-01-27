@@ -76,6 +76,7 @@ var config = {
 							);
 		current.openedWindow.addEventListener('load', function() {
 			current.openedWindow.removeEventListener('load', arguments.callee, false);
+			current.openedWindow._sourceURI = aURI;
 			current.openedWindow.addEventListener('unload', function() {
 				current.openedWindow.removeEventListener('unload', arguments.callee, false);
 				current.openedWindow = null;
@@ -199,8 +200,11 @@ WindowManager.addHandler(config);
 
 function shutdown()
 {
-	WindowManager.getWindows(TYPE_BROWSER).forEach(function(aWindow) {
-		config._onWindowUnload(aWindow);
+	WindowManager.getWindows(null).forEach(function(aWindow) {
+		if (aWindow.document.documentElement.getAttribute('windowtype') == TYPE_BROWSER)
+			config._onWindowUnload(aWindow);
+		else if (aWindow._sourceURI && aWindow._sourceURI in config._configs)
+			aWindow.close();
 	});
 	WindowManager = void(0);
 	config._configs = void(0);
