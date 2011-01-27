@@ -160,11 +160,18 @@ var config = {
 			case 'command':
 				let target = aEvent.originalTarget;
 				let uri;
-				if (target.getAttribute('anonid') == 'preferences-btn')
-					uri = aEvent.target.mAddon.optionsURL;
+				if (target.getAttribute('anonid') == 'preferences-btn' ||
+					target.id == 'cmd_showItemPreferences')
+					uri = target.ownerDocument.defaultView
+							.gViewController
+							.currentViewObj
+							.getSelectedAddon()
+							.optionsURL;
 				else if (target.id == 'cmd_options') // Firefox 3.6
 					uri = target.ownerDocument.defaultView
-							.gExtensionsView.currentItem.getAttribute('optionsURL');
+							.gExtensionsView
+							.currentItem
+							.getAttribute('optionsURL');
 				if (uri &&
 					(uri = this._resolveResURI(uri)) &&
 					uri in this._configs) {
