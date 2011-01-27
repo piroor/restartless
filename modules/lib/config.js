@@ -33,6 +33,7 @@ var config = {
 	 */
 	open : function(aURI)
 	{
+		aURI = this._resolveResURI(aURI);
 		if (!(aURI in this._configs))
 			return null;
 
@@ -86,7 +87,7 @@ var config = {
 	 */
 	register : function(aURI, aSource)
 	{
-		this._configs[aURI] = {
+		this._configs[this._resolveResURI(aURI)] = {
 			source       : aSource,
 			openedWindow : null
 		};
@@ -100,7 +101,7 @@ var config = {
 	 */
 	unregister : function(aURI)
 	{
-		delete this._configs[aURI];
+		delete this._configs[this._resolveResURI(aURI)];
 	},
 
 	/**
@@ -118,12 +119,61 @@ var config = {
 
 	observe : function(aSubject, aTopic, aData)
 	{
-		if (aSubject.location.href in this._configs) {
-			aSubject.setTimeout('window.close();', 0);
-			this.open(aSubject.location.href);
+		var uri = this._resolveResURI(aSubject.location.href);
+		if (!(uri in this._configs))
+			return;
+		var docShell = aSubject.top
+						.QueryInterface(Ci.nsIInterfaceRequestor)
+						.getInterface(Ci.nsIWebNavigation)
+						.QueryInterface(Ci.nsIDocShell);
+		var parent = docShell
+						.QueryInterface(Ci.nsIDocShellTreeNode)
+						.QueryInterface(Ci.nsIDocShellTreeItem)
+						.parent;
+		if (parent) {
+			parent = parent
+						.QueryInterface(Ci.nsIWebNavigation)
+						.document
+						.defaultView;
+			let tabs;
+			if (
+				parent.gBrowser &&
+				(tabs = parent.gBrowser.mTabContainer.childNodes) &&
+				(
+					tabs.length == 1 ||
+					!Array.slice(tabs)
+						.some(function(aTab) {
+							if (aTab.linkedBrowser.docShell == docShell) {
+								parent.gBrowser.removeTab(aTab);
+								return true;
+							}
+							return false;
+						})
+				)
+				) {
+				parent.setTimeout('window.close();', 0);
+			}
 		}
+		else {
+			aSubject.setTimeout('window.close();', 0);
+		}
+		this.open(uri);
+	},
+
+	_resolveResURI : function(aURI)
+	{
+		if (aURI.indexOf('resource:') == 0)
+			return ResProtocolHandler.resolveURI(IOService.newURI(aURI, null, null));
+		return aURI;
 	}
 };
+
+
+var IOService = Cc['@mozilla.org/network/io-service;1']
+						.getService(Ci.nsIIOService);
+var ResProtocolHandler = IOService
+						.getProtocolHandler('resource')
+						.QueryInterface(Ci.nsIResProtocolHandler);
 
 var ObserverService = Cc['@mozilla.org/observer-service;1']
 						.getService(Ci.nsIObserverService);
@@ -139,9 +189,12 @@ function shutdown()
 	ObserverService.removeObserver(config, 'chrome-document-global-created');
 	ObserverService.removeObserver(config, 'content-document-global-created');
 
+	ObserverService = void(0);
+	IOService = void(0);
+	ResProtocolHandler = void(0);
+
 	WindowManager = void(0);
 	config._configs = void(0);
 	config._windows = void(0);
 	config = void(0);
 }
-
