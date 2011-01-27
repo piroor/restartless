@@ -129,11 +129,10 @@ var config = {
 		var uri = this._resolveResURI(aSubject.location.href);
 		if (!(uri in this._configs))
 			return;
-		var docShell = aSubject.top
+		var parent = aSubject.top
 						.QueryInterface(Ci.nsIInterfaceRequestor)
 						.getInterface(Ci.nsIWebNavigation)
-						.QueryInterface(Ci.nsIDocShell);
-		var parent = docShell
+						.QueryInterface(Ci.nsIDocShell)
 						.QueryInterface(Ci.nsIDocShellTreeNode)
 						.QueryInterface(Ci.nsIDocShellTreeItem)
 						.parent;
@@ -142,24 +141,13 @@ var config = {
 						.QueryInterface(Ci.nsIWebNavigation)
 						.document
 						.defaultView;
-			let tabs;
 			if (
-				parent.gBrowser &&
-				(tabs = parent.gBrowser.mTabContainer.childNodes) &&
-				(
-					tabs.length == 1 ||
-					!Array.slice(tabs)
-						.some(function(aTab) {
-							if (aTab.linkedBrowser.docShell == docShell) {
-								parent.gBrowser.removeTab(aTab);
-								return true;
-							}
-							return false;
-						})
+				!parent.gBrowser ||
+				parent.gBrowser.mTabContainer.childNodes.length == 1
 				)
-				) {
 				parent.setTimeout('window.close();', 0);
-			}
+			else
+				aSubject.setTimeout('window.close();', 0);
 		}
 		else {
 			aSubject.setTimeout('window.close();', 0);
