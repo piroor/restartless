@@ -215,6 +215,17 @@ let (managers = WindowMediator.getEnumerator('Addons:Manager')) {
 		config._onLoadManager(managers.getNext().QueryInterface(Ci.nsIDOMWindow));
 	}
 }
+let (browsers = WindowMediator.getEnumerator('navigator:browser')) {
+	while (browsers.hasMoreElements())
+	{
+		let browser = browsers.getNext().QueryInterface(Ci.nsIDOMWindow);
+		Array.slice(browser.gBrowser.mTabContainer.childNodes)
+			.forEach(function(aTab) {
+			if (aTab.linkedBrowser.currentURI.spec == 'about:addons')
+				config._onLoadManager(aTab.linkedBrowser.contentWindow);
+		});
+	}
+}
 let (managers = WindowMediator.getEnumerator('Extension:Manager')) { // Firefox 3.6
 	while (managers.hasMoreElements())
 	{
@@ -239,9 +250,9 @@ function shutdown()
 
 	Prefs = void(0);
 	DefaultPrefs = void(0);
-	ObserverService = void(0);
 	IOService = void(0);
 	ResProtocolHandler = void(0);
+	ObserverService = void(0);
 	WindowMediator = void(0);
 
 	config._configs = void(0);
