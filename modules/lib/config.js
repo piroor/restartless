@@ -41,8 +41,16 @@ var config = {
 			return current.openedWindow;
 		}
 
-		var contents = Cc['@mozilla.org/variant;1'].createInstance(Ci.nsIWritableVariant);
-		contents.setFromVariant(current.content);
+		var title = Cc['@mozilla.org/variant;1']
+						.createInstance(Ci.nsIWritableVariant);
+		title.setFromVariant(current.title);
+		var content = Cc['@mozilla.org/variant;1']
+						.createInstance(Ci.nsIWritableVariant);
+		content.setFromVariant(current.content);
+		var args = Cc['@mozilla.org/supports-array;1']
+						.createInstance(Ci.nsISupportsArray);
+		args.AppendElement(title);
+		args.AppendElement(content);
 
 		current.openedWindow = Cc['@mozilla.org/embedcomp/window-watcher;1']
 							.getService(Ci.nsIWindowWatcher)
@@ -60,7 +68,7 @@ var config = {
 									',dialog=no' :
 									''// ',modal'
 								),
-								contents
+								args
 							);
 		current.openedWindow.addEventListener('load', function() {
 			current.openedWindow.removeEventListener('load', arguments.callee, false);
@@ -90,16 +98,20 @@ var config = {
 	{
 		var content = aXML.*;
 		var container = aXML.copy();
+		var title = aXML[0].@title;
 		delete container.*;
+		delete container.@title;
 		container.script = <script type="application/javascript"><![CDATA[
+			document.documentElement.setAttribute('title', arguments[0]);
 			var range = document.createRange();
 			range.selectNodeContents(document.documentElement);
 			range.collapse(true);
-			document.documentElement.appendChild(range.createContextualFragment(arguments[0]));
+			document.documentElement.appendChild(range.createContextualFragment(arguments[1]));
 			range.detach();
 		]]></script>;
 		this._configs[this._resolveResURI(aURI)] = {
 			originalURI  : aURI,
+			title        : title.toString(),
 			content      : content.toXMLString(),
 			container    : container.toString(),
 			openedWindow : null
