@@ -1,7 +1,7 @@
 /**
  * @fileOverview Main module for restartless addons
  * @author       SHIMODA "Piro" Hiroshi
- * @version      1
+ * @version      2
  *
  * @license
  *   The MIT License, Copyright (c) 2010 SHIMODA "Piro" Hiroshi.
@@ -12,7 +12,7 @@
 dump('main.js loaded\n');
 
 /**
- * load() works like Components.utils.load(). EXPORTED_SYMBOLS
+ * load() works like Components.utils.import(). EXPORTED_SYMBOLS
  * in loaded scripts are exported to the global object of this script.
  */
 load('lib/jsdeferred');
@@ -38,7 +38,7 @@ Deferred.next(function() {
  * Localized messages sample.
  */
 var bundle = require('lib/locale')
-				.get('locale/messages.properties', location.href);
+				.get(resolve('locale/messages.properties'));
 dump(bundle.getString('message')+'\n');
 
 

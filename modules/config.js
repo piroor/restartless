@@ -4,7 +4,7 @@ config.setDefault('extensions.restartless@piro.sakura.ne.jp.testBoolean', true);
 config.setDefault('extensions.restartless@piro.sakura.ne.jp.testInteger', 10);
 
 var bundle = require('lib/locale')
-				.get('locale/messages.properties', location.href);
+				.get(resolve('locale/messages.properties'));
 
 config.register('resource://restartless/config', <>
 

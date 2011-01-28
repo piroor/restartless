@@ -1,7 +1,7 @@
 /**
  * @fileOverview Loader module for restartless addons
  * @author       SHIMODA "Piro" Hiroshi
- * @version      2
+ * @version      3
  *
  * @license
  *   The MIT License, Copyright (c) 2010-2011 SHIMODA "Piro" Hiroshi.
@@ -49,9 +49,15 @@ function load(aURISpec, aExportTarget, aRoot)
 		return ns;
 	}
 	ns = _createNamespace(aURISpec, aRoot || aURISpec);
-	Components.classes['@mozilla.org/moz/jssubscript-loader;1']
-		.getService(Components.interfaces.mozIJSSubScriptLoader)
-		.loadSubScript(aURISpec, ns);
+	try {
+		Components.classes['@mozilla.org/moz/jssubscript-loader;1']
+			.getService(Components.interfaces.mozIJSSubScriptLoader)
+			.loadSubScript(aURISpec, ns);
+	}
+	catch(e) {
+		dump('Loader::load('+aURISpec+') failed!\n'+e+'\n');
+		throw e;
+	}
 	_exportSymbols(ns, aExportTarget);
 	return _namespaces[aURISpec] = ns;
 }
@@ -167,6 +173,9 @@ function _createNamespace(aURISpec, aRoot)
 					throw new Error('Recursive load!');
 				return load(resolved, aExportTarget || ns, rootURI);
 			},
+			'import' : function() { // alias
+				return this.load.apply(this, arguments);
+			},
 			/**
 			 * CommonJS style
 			 * @url http://www.commonjs.org/specs/
@@ -184,6 +193,15 @@ function _createNamespace(aURISpec, aRoot)
 				var exported = {};
 				load(resolved, exported, rootURI);
 				return exported;
+			},
+			/* utility to resolve relative path from the file */
+			resolve : function(aURISpec, aBaseURI) {
+				var base = !aBaseURI ?
+								baseURI :
+							aBaseURI.indexOf('file:') == 0 ?
+								IOService.newFileURI(FileHandler.getFileFromURLSpec(aURISpec)) :
+								IOService.newURI(aURISpec, null, null) ;
+				return base.resolve(aURISpec);
 			},
 			exports : {}
 		};
