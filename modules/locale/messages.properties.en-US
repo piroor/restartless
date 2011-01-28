@@ -1,4 +1,8 @@
 message=This is a localized message.
 
 config.title=Configuration Dialog
+config.general=General
 config.testBoolean=This is a boolean setting.
+config.appearance=Appearance
+config.testInteger=This is an integer.
+

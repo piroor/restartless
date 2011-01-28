@@ -1,4 +1,8 @@
 message=ローカライズ済みのメッセージです。
 
 config.title=設定ダイアログ
+config.general=全般
 config.testBoolean=真偽値の設定
+config.appearance=外観
+config.testInteger=整数値の設定
+

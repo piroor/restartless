@@ -1,7 +1,7 @@
 /**
  * @fileOverview Configuration dialog module for restartless addons
  * @author       SHIMODA "Piro" Hiroshi
- * @version      3
+ * @version      4
  *
  * @license
  *   The MIT License, Copyright (c) 2011 SHIMODA "Piro" Hiroshi.
@@ -45,7 +45,7 @@ var config = {
 
 		var source = Cc['@mozilla.org/variant;1']
 						.createInstance(Ci.nsIWritableVariant);
-		source.setFromVariant(JSON.stringify(current.source));
+		source.setFromVariant(current.source);
 
 		if (aOwner) {
 			let parent = aOwner.top
@@ -106,44 +106,35 @@ var config = {
 	 */
 	register : function(aURI, aXML)
 	{
-		var content = aXML.*;
-
-		var container = aXML.copy();
-		delete container.*;
-		var attributes = container[0].attributes();
-		var attributesHash = {};
+		var root = aXML.copy();
+		delete root.*;
+		var attributes = root.attributes();
 		for each (var attribute in attributes)
 		{
-			let name = attribute.name();
-			attributesHash[name] = attribute.toString();
-			delete container[0]['@'+name];
+			delete root['@'+attribute.name()];
 		}
-		container.script = <script type="application/javascript">{ this._loader }</script>;
+		root.script = <script type="application/javascript">{ this._loader }</script>;
 
 		var header = '<?xml version="1.0"?>\n'+
 					'<!-- ' + aURI + ' -->\n'+
 					'<?xml-stylesheet href="chrome://global/skin/"?>\n';
 
 		this._configs[this._resolveResURI(aURI)] = {
-			container    : header+container.toString(),
-			source       : {
-				a : attributesHash,
-				c : content.toXMLString()
-			},
+			container    : header+root.toXMLString(),
+			source       : aXML.toXMLString(),
 			openedWindow : null
 		};
 	},
 	_loader : <![CDATA[
 		var d = document;
 		var e = d.documentElement;
-		var s = JSON.parse(arguments[0]);
-		for (var i in s.a) { e.setAttribute(i, s.a[i]); }
 		var r = d.createRange();
-		r.selectNodeContents(e);
-		r.collapse(true);
-		e.appendChild(r.createContextualFragment(s.c));
+		r.selectNode(e);
+		d.replaceChild(r.createContextualFragment(arguments[0]), e);
 		r.detach();
-	]]>.toString().replace(/\s\s+/g, ' '),
+	]]>.toString()
+		.replace(/\/\/.*$/gm, '')
+		.replace(/\s\s+/g, ' '),
 
 	/**
 	 * Unregisters a registeed dialog for the given URI.
