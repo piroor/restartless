@@ -24,11 +24,13 @@ var config = {
 	 *
 	 * @param {String} aURI
 	 *   A URI which is bould to any configuration dialog.
+	 * @param {nsIDOMWindow} aOwner
+	 *   An owner window of the dialog.
 	 *
 	 * @returns {nsIDOMWindow}
 	 *   The window object of the configuration dialog.
 	 */
-	open : function(aURI)
+	open : function(aURI, aOwner)
 	{
 		aURI = this._resolveResURI(aURI);
 		if (!(aURI in this._configs))
@@ -45,10 +47,26 @@ var config = {
 						.createInstance(Ci.nsIWritableVariant);
 		source.setFromVariant(JSON.stringify(current.source));
 
+		if (aOwner) {
+			let parent = aOwner.top
+							.QueryInterface(Ci.nsIInterfaceRequestor)
+							.getInterface(Ci.nsIWebNavigation)
+							.QueryInterface(Ci.nsIDocShell)
+							.QueryInterface(Ci.nsIDocShellTreeNode)
+							.QueryInterface(Ci.nsIDocShellTreeItem)
+							.parent;
+			if (parent)
+				aOwner = parent.QueryInterface(Ci.nsIWebNavigation)
+							.document
+							.defaultView;
+			else
+				aOwner = null;
+		}
+
 		current.openedWindow = Cc['@mozilla.org/embedcomp/window-watcher;1']
 							.getService(Ci.nsIWindowWatcher)
 							.openWindow(
-								null,
+								aOwner || null,
 								'data:application/vnd.mozilla.xul+xml,'+encodeURIComponent(
 									current.container
 								),
@@ -56,7 +74,9 @@ var config = {
 								'chrome,titlebar,toolbar,centerscreen' +
 								(Prefs.getBoolPref('browser.preferences.instantApply') ?
 									',dialog=no' :
-									''// ',modal'
+								aOwner ?
+									',modal' :
+									''
 								),
 								source
 							);
@@ -210,7 +230,7 @@ var config = {
 				if (uri &&
 					(uri = this._resolveResURI(uri)) &&
 					uri in this._configs) {
-					this.open(uri);
+					this.open(uri, target.ownerDocument.defaultView);
 					aEvent.stopPropagation();
 					aEvent.preventDefault();
 				}
