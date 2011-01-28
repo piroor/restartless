@@ -1,7 +1,7 @@
 /**
  * @fileOverview Window manager module for restartless addons
  * @author       SHIMODA "Piro" Hiroshi
- * @version      2
+ * @version      3
  *
  * @license
  *   The MIT License, Copyright (c) 2010-2011 SHIMODA "Piro" Hiroshi.
@@ -137,6 +137,14 @@ var WindowManager = {
 			return array;
 		}
 	};
+for (let i in WindowManager)
+{
+	exports[i] = (function(aSymbol) {
+		return function() {
+			return WindowManager[aSymbol].apply(WindowManager, arguments);
+		};
+	})(i);
+}
 
 /** A handler for bootstrap.js */
 function shutdown()

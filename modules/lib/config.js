@@ -11,6 +11,14 @@
 
 const EXPORTED_SYMBOLS = ['config'];
 
+'open,register,unregister,setDefault'.split(',').forEach(function(aSymbol) {
+	exports[aSymbol] = function() {
+		if (!config)
+			throw new Error('config module was already unloaded!');
+		return config[aSymbol].apply(config, arguments);
+	};
+});
+
 /**
  * @class
  *   Provides features to manage custom configuration dialog.

@@ -1,7 +1,7 @@
 /**
  * @fileOverview Loader module for restartless addons
  * @author       SHIMODA "Piro" Hiroshi
- * @version      3
+ * @version      4
  *
  * @license
  *   The MIT License, Copyright (c) 2010-2011 SHIMODA "Piro" Hiroshi.
@@ -30,22 +30,25 @@ var _namespaces;
  * @param {String} aScriptURL
  *   URL of a script. Wrapped version of load() can handle related path.
  *   Related path will be resolved based on the location of the caller script.
- * @param {Object=} aExportTarget
+ * @param {Object=} aExportTargetForImport
  *   EXPORTED_SYMBOLS in the loaded script will be exported to the object.
  *   If no object is specified, symbols will be exported to the global object
  *   of the caller.
+ * @param {Object=} aExportTargetForRequire
+ *   Properties of "exports" in the loaded script will be exported to the object.
  *
  * @returns {Object}
  *   The global object for the loaded script.
  */
-function load(aURISpec, aExportTarget, aRoot)
+function load(aURISpec, aExportTargetForImport, aExportTargetForRequire, aRoot)
 {
 	if (!_namespaces)
 		_namespaces = {};
 	var ns;
 	if (aURISpec in _namespaces) {
 		ns = _namespaces[aURISpec];
-		_exportSymbols(ns, aExportTarget);
+		_exportForImport(ns, aExportTargetForImport);
+		_exportForRequire(ns, aExportTargetForRequire);
 		return ns;
 	}
 	ns = _createNamespace(aURISpec, aRoot || aURISpec);
@@ -58,37 +61,40 @@ function load(aURISpec, aExportTarget, aRoot)
 		dump('Loader::load('+aURISpec+') failed!\n'+e+'\n');
 		throw e;
 	}
-	_exportSymbols(ns, aExportTarget);
+	_exportForImport(ns, aExportTargetForImport);
+	_exportForRequire(ns, aExportTargetForRequire);
 	return _namespaces[aURISpec] = ns;
 }
 
-function _exportSymbols(aSource, aTarget)
+// JavaScript code module style
+function _exportForImport(aSource, aTarget)
 {
-	if (!aTarget)
+	if (
+		!aTarget ||
+		!('EXPORTED_SYMBOLS' in aSource) ||
+		!aSource.EXPORTED_SYMBOLS ||
+		!aSource.EXPORTED_SYMBOLS.forEach
+		)
 		return;
-
-	// JavaScript code module style
-	if (
-		('EXPORTED_SYMBOLS' in aSource) &&
-		aSource.EXPORTED_SYMBOLS &&
-		aSource.EXPORTED_SYMBOLS.map &&
-		typeof aSource.EXPORTED_SYMBOLS.map == 'function'
-		) {
-		aSource.EXPORTED_SYMBOLS.map(function(aSymbol) {
-			aTarget[aSymbol] = aSource[aSymbol];
-		});
+	for each (var symbol in aSource.EXPORTED_SYMBOLS)
+	{
+		aTarget[symbol] = aSource[symbol];
 	}
+}
 
-	// CommonJS style
+// CommonJS style
+function _exportForRequire(aSource, aTarget)
+{
 	if (
-		('exports' in aSource) &&
-		aSource.exports &&
-		typeof aSource.exports == 'object'
-		) {
-		for (let symbol in aSource.exports)
-		{
-			aTarget[symbol] = aSource[symbol];
-		}
+		!aTarget ||
+		!('exports' in aSource) ||
+		!aSource.exports ||
+		typeof aSource.exports != 'object'
+		)
+		return;
+	for (var symbol in aSource.exports)
+	{
+		aTarget[symbol] = aSource.exports[symbol];
 	}
 }
 
@@ -171,7 +177,7 @@ function _createNamespace(aURISpec, aRoot)
 				var resolved = baseURI.resolve(aURISpec);
 				if (resolved == aURISpec)
 					throw new Error('Recursive load!');
-				return load(resolved, aExportTarget || ns, rootURI);
+				return load(resolved, aExportTarget || ns, aExportTarget, rootURI);
 			},
 			'import' : function() { // alias
 				return this.load.apply(this, arguments);
@@ -191,7 +197,7 @@ function _createNamespace(aURISpec, aRoot)
 				if (resolved == aURISpec)
 					throw new Error('Recursive load!');
 				var exported = {};
-				load(resolved, exported, rootURI);
+				load(resolved, exported, exported, rootURI);
 				return exported;
 			},
 			/* utility to resolve relative path from the file */
@@ -274,6 +280,15 @@ function uninstall(aReason)
 function shutdown(aReason)
 {
 	_callHandler('shutdown', aReason);
+
+	for each (let ns in _namespaces)
+	{
+		for (let i in ns.exports)
+		{
+			if (ns.exports.hasOwnProperty(i))
+				delete ns.exports[i];
+		}
+	}
 	_namespaces = void(0);
 
 	IOService = void(0);

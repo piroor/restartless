@@ -1,7 +1,7 @@
 /**
  * @fileOverview Locale module for restartless addons
  * @author       SHIMODA "Piro" Hiroshi
- * @version      2
+ * @version      3
  *
  * @license
  *   The MIT License, Copyright (c) 2010-2011 SHIMODA "Piro" Hiroshi.
@@ -49,6 +49,7 @@ var get = function(aPath, aBaseURI) {
 		}
 		return gCache[uri];
 	};
+exports.get = get;
 
 const Service = Cc['@mozilla.org/intl/stringbundle;1']
 					.getService(Ci.nsIStringBundleService);
