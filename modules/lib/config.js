@@ -41,25 +41,15 @@ var config = {
 			return current.openedWindow;
 		}
 
-		var title = Cc['@mozilla.org/variant;1']
+		var source = Cc['@mozilla.org/variant;1']
 						.createInstance(Ci.nsIWritableVariant);
-		title.setFromVariant(current.title);
-		var content = Cc['@mozilla.org/variant;1']
-						.createInstance(Ci.nsIWritableVariant);
-		content.setFromVariant(current.content);
-		var args = Cc['@mozilla.org/supports-array;1']
-						.createInstance(Ci.nsISupportsArray);
-		args.AppendElement(title);
-		args.AppendElement(content);
+		source.setFromVariant(JSON.stringify(current.source));
 
 		current.openedWindow = Cc['@mozilla.org/embedcomp/window-watcher;1']
 							.getService(Ci.nsIWindowWatcher)
 							.openWindow(
 								null,
 								'data:application/vnd.mozilla.xul+xml,'+encodeURIComponent(
-									'<?xml version="1.0"?>\n'+
-									'<!-- ' + current.originalURI + ' -->\n'+
-									'<?xml-stylesheet href="chrome://global/skin/"?>\n'+
 									current.container
 								),
 								'_blank',
@@ -68,7 +58,7 @@ var config = {
 									',dialog=no' :
 									''// ',modal'
 								),
-								args
+								source
 							);
 		current.openedWindow.addEventListener('load', function() {
 			current.openedWindow.removeEventListener('load', arguments.callee, false);
@@ -97,26 +87,43 @@ var config = {
 	register : function(aURI, aXML)
 	{
 		var content = aXML.*;
+
 		var container = aXML.copy();
-		var title = aXML[0].@title;
 		delete container.*;
-		delete container.@title;
-		container.script = <script type="application/javascript"><![CDATA[
-			document.documentElement.setAttribute('title', arguments[0]);
-			var range = document.createRange();
-			range.selectNodeContents(document.documentElement);
-			range.collapse(true);
-			document.documentElement.appendChild(range.createContextualFragment(arguments[1]));
-			range.detach();
-		]]></script>;
+		var attributes = container[0].attributes();
+		var attributesHash = {};
+		for each (var attribute in attributes)
+		{
+			let name = attribute.name();
+			attributesHash[name] = attribute.toString();
+			delete container[0]['@'+name];
+		}
+		container.script = <script type="application/javascript">{ this._loader }</script>;
+
+		var header = '<?xml version="1.0"?>\n'+
+					'<!-- ' + aURI + ' -->\n'+
+					'<?xml-stylesheet href="chrome://global/skin/"?>\n';
+
 		this._configs[this._resolveResURI(aURI)] = {
-			originalURI  : aURI,
-			title        : title.toString(),
-			content      : content.toXMLString(),
-			container    : container.toString(),
+			container    : header+container.toString(),
+			source       : {
+				a : attributesHash,
+				c : content.toXMLString()
+			},
 			openedWindow : null
 		};
 	},
+	_loader : <![CDATA[
+		var d = document;
+		var e = d.documentElement;
+		var s = JSON.parse(arguments[0]);
+		for (var i in s.a) { e.setAttribute(i, s.a[i]); }
+		var r = d.createRange();
+		r.selectNodeContents(e);
+		r.collapse(true);
+		e.appendChild(r.createContextualFragment(s.c));
+		r.detach();
+	]]>.toString().replace(/\s\s+/g, ' '),
 
 	/**
 	 * Unregisters a registeed dialog for the given URI.
