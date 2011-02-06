@@ -76,7 +76,7 @@ function _reasonToString(aReason)
 
 function install(aData, aReason)
 {
-	_loadMain(aData.id, aData.installPath, aReason);
+	_loadMain(aData.id, aData.installPath, _reasonToString(aReason));
 	_gLoader.install(_reasonToString(aReason));
 }
 
