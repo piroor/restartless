@@ -17,7 +17,11 @@ dump('main.js loaded\n');
  */
 load('lib/jsdeferred');
 load('lib/WindowManager');
-load('config');
+// this.import() also available instead of load(), as an alias.
+// Note: don't use simply "import()" without the prefix "this.",
+// because the keyword "import" will be a reserved word in future.
+// https://developer.mozilla.org/en/JavaScript/Strict_mode#Paving_the_way_for_future_ECMAScript_versions
+this.import('config');
 
 /**
  * Timer sample.
