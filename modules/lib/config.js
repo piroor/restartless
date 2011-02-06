@@ -1,7 +1,7 @@
 /**
  * @fileOverview Configuration dialog module for restartless addons
  * @author       SHIMODA "Piro" Hiroshi
- * @version      4
+ * @version      5
  *
  * @license
  *   The MIT License, Copyright (c) 2011 SHIMODA "Piro" Hiroshi.
@@ -127,11 +127,17 @@ var config = {
 					'<!-- ' + aURI + ' -->\n'+
 					'<?xml-stylesheet href="chrome://global/skin/"?>\n';
 
+		var originalSettings = XML.settings();
+		XML.ignoreWhitespace = true;
+		XML.prettyPrinting = false;
+
 		this._configs[this._resolveResURI(aURI)] = {
-			container    : header+root.toXMLString(),
-			source       : aXML.toXMLString(),
+			container    : header+((new XMLList(root.toXMLString())).toXMLString()),
+			source       : (new XMLList(aXML.toXMLString())).toXMLString(),
 			openedWindow : null
 		};
+
+		XML.setSettings(originalSettings);
 	},
 	_loader : <![CDATA[
 		var d = document;
