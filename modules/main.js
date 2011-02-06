@@ -12,12 +12,12 @@
 dump('main.js loaded\n');
 
 /**
- * load() works like Components.utils.import(). EXPORTED_SYMBOLS
+ * import() works like Components.utils.import(). EXPORTED_SYMBOLS
  * in loaded scripts are exported to the global object of this script.
  */
-load('lib/jsdeferred');
-load('lib/WindowManager');
-load('config');
+import('lib/jsdeferred');
+import('lib/WindowManager');
+import('config');
 
 /**
  * Timer sample.

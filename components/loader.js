@@ -24,8 +24,6 @@ var _namespaces;
  * This functiom loads specified script into a unique namespace for the URL.
  * Namespaces for loaded scripts have a wrapped version of this function.
  * Both this and wrapped work like as Components.utils.import().
- * Due to the reserved symbol "import", we have to use another name "load"
- * instead it.
  *
  * @param {String} aScriptURL
  *   URL of a script. Wrapped version of load() can handle related path.
