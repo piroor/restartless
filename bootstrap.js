@@ -50,7 +50,7 @@ function _loadMain(aId, aRoot, aReason)
 	Components.classes['@mozilla.org/moz/jssubscript-loader;1']
 		.getService(Components.interfaces.mozIJSSubScriptLoader)
 		.loadSubScript(loader, _gLoader);
-	_gLoader.registerResource(aId.split('@')[0], resource);
+	_gLoader.registerResource(aId.split('@')[0]+'-resources', resource);
 	_gLoader.load(main);
 }
 
@@ -88,7 +88,7 @@ function startup(aData, aReason)
 function shutdown(aData, aReason)
 {
 	if (!_gLoader) return;
-	_gLoader.unregisterResource(aData.id.split('@')[0]);
+	_gLoader.unregisterResource(aData.id.split('@')[0]+'-resources');
 	_gLoader.shutdown(_reasonToString(aReason));
 	_gLoader = void(0);
 }
