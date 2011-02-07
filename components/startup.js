@@ -31,7 +31,7 @@ function StartupService() {
 }
 StartupService.prototype = {
 	classDescription : ADDON_ID+' Startup Service', 
-	contractID : '@piro.sakura.ne.jp/'+ADDON_ID.split('@')[0]+'/startup;1',
+	contractID : '@'+ADDON_ID.split('@').reverse().join('/')+'/startup;1',
 	classID : Components.ID(CLASS_ID),
 	_xpcom_categories : [
 		{ category : 'app-startup', service : true }
