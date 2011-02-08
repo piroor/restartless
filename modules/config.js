@@ -6,7 +6,7 @@ config.setDefault('extensions.restartless@piro.sakura.ne.jp.testInteger', 10);
 var bundle = require('lib/locale')
 				.get(resolve('locale/messages.properties'));
 
-config.register('resource://restartless/config', <>
+config.register('about:blank?restartless-config', <>
 
 <prefwindow id="restartless-config"
 	xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
