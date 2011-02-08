@@ -146,6 +146,33 @@ function exists(aPath, aBaseURI)
 	}
 }
 
+function doAndWait(aAsyncTask)
+{
+	const Cc = Components.classes;
+	const Ci = Components.interfaces;
+
+	var done = false;
+	var returnedValue = void(0);
+	var continuation = function(aReturnedValue) {
+			done = true;
+			returnedValue = aReturnedValue;
+		};
+
+	var timer = Cc['@mozilla.org/timer;1']
+					.createInstance(Ci.nsITimer);
+	timer.init(function() {
+		aAsyncTask(continuation);
+	}, 0, Ci.nsITimer.TYPE_ONE_SHOT);
+
+	var thread = Cc['@mozilla.org/thread-manager;1']
+					.getService(Ci.nsIThreadManager)
+					.currentThread;
+	while (!done) {
+		thread.processNextEvent(true);
+	}
+	return returnedValue;
+}
+
 function _createNamespace(aURISpec, aRoot)
 {
 	var baseURI = aURISpec.indexOf('file:') == 0 ?
@@ -208,6 +235,9 @@ function _createNamespace(aURISpec, aRoot)
 								IOService.newFileURI(FileHandler.getFileFromURLSpec(aURISpec)) :
 								IOService.newURI(aURISpec, null, null) ;
 				return base.resolve(aURISpec);
+			},
+			doAndWait : function(aAsyncTask) {
+				return doAndWait(aAsyncTask);
 			},
 			exports : {}
 		};

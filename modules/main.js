@@ -87,6 +87,18 @@ function shutdown()
 		label.parentNode.removeChild(label);
 	});
 
+	var result = doAndWait(function(aContinuation) {
+			// You can do an asynchronus shutdown
+			// in another event loop. Until you call
+			// the continuation function, doAndWait()
+			// stops the main event loop. If you give
+			// any argument to the continuation function,
+			// then it becomes the returned value of
+			// doAndWait() itself.
+			aContinuation('OK');
+		});
+	// result == 'OK'
+
 	// free loaded symbols
 	Deferred = void(0);
 	WindowManager = void(0);
