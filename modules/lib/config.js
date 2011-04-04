@@ -1,7 +1,7 @@
 /**
  * @fileOverview Configuration dialog module for restartless addons
  * @author       SHIMODA "Piro" Hiroshi
- * @version      5
+ * @version      6
  *
  * @license
  *   The MIT License, Copyright (c) 2011 SHIMODA "Piro" Hiroshi.
@@ -286,11 +286,12 @@ let (browsers = WindowMediator.getEnumerator('navigator:browser')) {
 	while (browsers.hasMoreElements())
 	{
 		let browser = browsers.getNext().QueryInterface(Ci.nsIDOMWindow);
-		Array.slice(browser.gBrowser.mTabContainer.childNodes)
-			.forEach(function(aTab) {
-			if (aTab.linkedBrowser.currentURI.spec == 'about:addons')
-				config._onLoadManager(aTab.linkedBrowser.contentWindow);
-		});
+		if (browser.gBrowser)
+			Array.slice(browser.gBrowser.mTabContainer.childNodes)
+				.forEach(function(aTab) {
+				if (aTab.linkedBrowser.currentURI.spec == 'about:addons')
+					config._onLoadManager(aTab.linkedBrowser.contentWindow);
+			});
 	}
 }
 let (managers = WindowMediator.getEnumerator('Extension:Manager')) { // Firefox 3.6
