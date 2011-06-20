@@ -1,7 +1,7 @@
 /**
  * @fileOverview Configuration dialog module for restartless addons
  * @author       SHIMODA "Piro" Hiroshi
- * @version      6
+ * @version      7
  *
  * @license
  *   The MIT License, Copyright (c) 2011 SHIMODA "Piro" Hiroshi.
@@ -53,7 +53,7 @@ var config = {
 
 		var source = Cc['@mozilla.org/variant;1']
 						.createInstance(Ci.nsIWritableVariant);
-		source.setFromVariant(current.source);
+		source.setFromVariant([this._builder.toSource(), current.source]);
 
 		if (aOwner) {
 			let parent = aOwner.top
@@ -111,13 +111,18 @@ var config = {
 	 *   A source of a XUL document for a configuration dialog defined as an
 	 *   E4X object (XML object). Typical headers (<?xml version="1.0"?> and
 	 *   an <?xml-stylesheet?> for the default theme) are automatically added.
+	 *   Note: Any <script/> elements must be written as XHTML script elements.
+	 *   (ex. <script xmlns="http://www.w3.org/1999/xhtml" ...> )
+	 *   If you put XUL <script/>s in your dialog, they won't be evaluated
+	 *   because they are inserted to the document dynamically. Only XHTML
+	 *   script elements are evaluated by dynamic insertion.
 	 */
 	register : function(aURI, aXML)
 	{
 		var root = aXML.copy();
 		delete root.*;
 		var attributes = root.attributes();
-		for each (var attribute in attributes)
+		for each (let attribute in attributes)
 		{
 			delete root['@'+attribute.name()];
 		}
@@ -140,15 +145,18 @@ var config = {
 		XML.setSettings(originalSettings);
 	},
 	_loader : <![CDATA[
-		var d = document;
-		var e = d.documentElement;
-		var r = d.createRange();
-		r.selectNode(e);
-		d.replaceChild(r.createContextualFragment(arguments[0]), e);
-		r.detach();
+		eval('f='+arguments[0][0]);
+		f(document, arguments[0][1]);
 	]]>.toString()
-		.replace(/\/\/.*$/gm, '')
 		.replace(/\s\s+/g, ' '),
+	_builder : function(aDocument, aSource)
+	{
+		var root = aDocument.documentElement;
+		var range = aDocument.createRange();
+		range.selectNode(root);
+		aDocument.replaceChild(range.createContextualFragment(aSource), root);
+		range.detach();
+	},
 
 	/**
 	 * Unregisters a registeed dialog for the given URI.
