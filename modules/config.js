@@ -12,7 +12,8 @@ config.register('about:blank?restartless-config', <>
 	xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
 	title={bundle.getString('config.title')}>
 
-	<prefpane id="prefpane-general" label={bundle.getString('config.general')}>
+	<prefpane id="prefpane-general" label={bundle.getString('config.general')}
+		onpaneload="initGeneralPane();">
 		<preferences>
 			<preference id="testBoolean"
 				name="extensions.restartless@piro.sakura.ne.jp.testBoolean"
@@ -44,6 +45,14 @@ config.register('about:blank?restartless-config', <>
 		</hbox>
 
 	</prefpane>
+
+	<!-- This must be created as an XHTML script element, not XUL one, because
+	     XUL script elements are not evaluated when they are dynamically inserted. -->
+	<script type="application/javascript"
+		xmlns="http://www.w3.org/1999/xhtml"><![CDATA[
+		function initGeneralPane() {
+		}
+	]]></script>
 
 </prefwindow>
 
