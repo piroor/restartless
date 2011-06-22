@@ -17,6 +17,8 @@ dump('main.js loaded\n');
  */
 load('lib/jsdeferred');
 load('lib/WindowManager');
+load('lib/ToolbarItem');
+load('lib/KeyboardShortcut');
 // this.import() also available instead of load(), as an alias.
 // Note: don't use simply "import()" without the prefix "this.",
 // because the keyword "import" will be a reserved word in future.
@@ -69,6 +71,19 @@ function handleWindow(aWindow)
 	range.insertNode(fragment);
 
 	range.detach();
+
+	/* sample: customizable toolbar button */
+	ToolbarItem.create(<>
+		<toolbarbutton id="restartless-test-button">
+			<label value={bundle.getString('message')}/>
+		</toolbarbutton>
+	</>, doc.getElementById('nav-bar'));
+
+	/* sample: keyboard shortcut */
+	KeyboardShortcut.create({
+		shortcut  : 'Ctrl-F2',
+		oncommand : 'alert("hello!");'
+	}, doc.getElementById('mainKeyset'));
 }
 
 WindowManager.getWindows(TYPE_BROWSER).forEach(handleWindow);
@@ -100,8 +115,10 @@ function shutdown()
 	// result == 'OK'
 
 	// free loaded symbols
-	Deferred = void(0);
-	WindowManager = void(0);
-	timer = void(0);
-	bundle = void(0);
+	Deferred = undefined;
+	WindowManager = undefined;
+	ToolbarItem = undefined;
+	KeyboardShortcut = undefined;
+	timer = undefined;
+	bundle = undefined;
 }
