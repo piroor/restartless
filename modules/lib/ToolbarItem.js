@@ -1,7 +1,7 @@
 /**
  * @fileOverview Toolbar item module for restartless addons
  * @author       SHIMODA "Piro" Hiroshi
- * @version      1
+ * @version      2
  *
  * @license
  *   The MIT License, Copyright (c) 2011 SHIMODA "Piro" Hiroshi.
@@ -45,12 +45,22 @@ ToolbarItem.prototype = {
 	{
 		return this._getNodeByXPath('/descendant::*[local-name()="toolbar" and @customizable="true"][1]');
 	},
-	get palette()
+	get toolbox()
 	{
 		var toolbar = this.defaultToolbar || this.defaultCustomizableToolbar;
+		return toolbar.toolbox ||
+			this._getOwnerToolbox(toolbar); // for Firefox 3.6
+	},
+	_getOwnerToolbox : function(aToolbar)
+	{
+		return this._getNodeByXPath('ancestor::*[local-name()="toolbox"][1]', aToolbar);
+	},
+	get palette()
+	{
+		var toolbox = this.toolbox;
 		return (
-			(toolbar.toolbox && toolbar.toolbox.palette) ||
-			this._getNodeByXPath('ancestor::*[local-name()="toolbox"]/descendant::*[local-name()="toolbarpalette"]', toolbar)
+			(toolbox && toolbox.palette) ||
+			this._getNodeByXPath('descendant::*[local-name()="toolbarpalette"]', toolbox)
 		);
 	},
 
@@ -67,8 +77,15 @@ ToolbarItem.prototype = {
 		this._document = this.node.ownerDocument || this.node;
 		this._window = this._document.defaultView;
 
-		this._window.addEventListener('beforecustomization', this, false);
-		this._window.addEventListener('aftercustomization', this, false);
+		if (Cc['@mozilla.org/xpcom/version-comparator;1']
+				.getService(Ci.nsIVersionComparator)
+				.compare(XULAppInfo.version, '4.0') < 0) { // Firefox 3.6
+			this.toolbox.addEventListener('DOMAttrModified', this, false);
+		}
+		else {
+			this._window.addEventListener('beforecustomization', this, false);
+			this._window.addEventListener('aftercustomization', this, false);
+		}
 		this._window.addEventListener('unload', this, false);
 
 		ToolbarItem.instances.push(this);
@@ -86,8 +103,15 @@ ToolbarItem.prototype = {
 		this._onBeforeCustomization();
 		this._removeFromDefaultSet();
 
-		this._window.removeEventListener('beforecustomization', this, false);
-		this._window.removeEventListener('aftercustomization', this, false);
+		if (Cc['@mozilla.org/xpcom/version-comparator;1']
+				.getService(Ci.nsIVersionComparator)
+				.compare(XULAppInfo.version, '4.0') < 0) { // Firefox 3.6
+			this.toolbox.removeEventListener('DOMAttrModified', this, false);
+		}
+		else {
+			this._window.removeEventListener('beforecustomization', this, false);
+			this._window.removeEventListener('aftercustomization', this, false);
+		}
 		this._window.removeEventListener('unload', this, false);
 
 		if (this.node.parentNode)
@@ -140,14 +164,6 @@ ToolbarItem.prototype = {
 
 	_initialInsert : function()
 	{
-		this._appendToDefaultSet();
-		if (this._checkInsertedInOtherPlace())
-			return;
-
-		var toolbar = this.defaultToolbar;
-		if (toolbar && !toolbar.toolbox)
-			return;
-
 		const Prefs = Cc['@mozilla.org/preferences;1']
 						.getService(Ci.nsIPrefBranch);
 		const key = 'extensions.restartless@piro.sakura.ne.jp.toolbaritem.'+this.id+'.initialized';
@@ -159,13 +175,16 @@ ToolbarItem.prototype = {
 		catch(e) {
 		}
 
-		if (done || !toolbar) {
-			let palette = this.palette;
-			if (palette)
-				palette.appendChild(this.node);
-		}
-		else {
-			this._insertToDefaultToolbar();
+		this._appendToDefaultSet();
+
+		let palette = this.palette;
+		if (palette)
+			palette.appendChild(this.node);
+
+		if (!this._checkInsertedInOtherPlace()) {
+			let toolbar = this.defaultToolbar;
+			if (!done && toolbar && this.toolbox)
+				this._insertToDefaultToolbar();
 		}
 
 		if (!done)
@@ -224,10 +243,9 @@ ToolbarItem.prototype = {
 			do {
 				index++;
 			}
-			while (!this._document.getElementById(items[index]));
+			while (index < items.length - 1 && !this._document.getElementById(items[index]));
 
-			if (index < items.length)
-				toolbar.insertBefore(this.node, this._document.getElementById(items[index]));
+			toolbar.insertBefore(this.node, this._document.getElementById(items[index]));
 		}
 		return true;
 	},
@@ -238,8 +256,6 @@ ToolbarItem.prototype = {
 		if (!toolbar)
 			return;
 
-		toolbar.insertBefore(this.node, this._getLastItemInToolbar(toolbar));
-
 		var currentset = toolbar.currentSet.replace(/__empty/, '');
 		currentset = currentset ? currentset.split(',') : [] ;
 		currentset.push(this.id);
@@ -247,6 +263,8 @@ ToolbarItem.prototype = {
 		toolbar.currentSet = currentset;
 		toolbar.setAttribute('currentset', currentset);
 		this._document.persist(toolbar.id, 'currentset');
+
+		toolbar.insertBefore(this.node, this._getLastItemInToolbar(toolbar));
 	},
 
 	_getLastItemInToolbar : function(aToolbar)
@@ -270,6 +288,16 @@ ToolbarItem.prototype = {
 	{
 		switch (aEvent.type)
 		{
+			case 'DOMAttrModified': // Firefox 3.6
+				if (aEvent.target == aEvent.currentTarget &&
+					aEvent.attrName == 'customizing') {
+					if (aEvent.newValue == 'true')
+						this._onBeforeCustomization();
+					else
+						this._onAfterCustomization();
+				}
+				return;
+
 			case 'beforecustomization':
 				return this._onBeforeCustomization();
 
@@ -338,9 +366,11 @@ ToolbarItem.create = function(aXML, aOwner, aOptions) {
  *   A owner document or a XUL element which becomes to the parent of the created document fragment.
  */
 ToolbarItem.toDOMDocumentFragment = function(aXML, aOwner) {
+try{
 	var doc = aOwner.ownerDocument || aOwner;
 	var range = doc.createRange();
-	range.selectNodeContents(aOwner);
+	// createContextualFragment failes when the range is in an anonymous content.
+	range.selectNodeContents(doc.getBindingParent(aOwner) || aOwner);
 
 	var originalSettings = XML.settings();
 	XML.ignoreWhitespace = true;
@@ -349,7 +379,7 @@ ToolbarItem.toDOMDocumentFragment = function(aXML, aOwner) {
 	XML.setSettings(originalSettings);
 
 	range.detach();
-
+}catch(e){dump(e+'\n\n'+aXML.toXMLString()+'\n');}
 	return fragment;
 };
 
