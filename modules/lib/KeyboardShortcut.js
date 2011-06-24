@@ -159,7 +159,7 @@ KeyboardShortcut.toKeyboardShortcut = function(aEvent) {
 	var shortcut = [];
 	if (aEvent.altKey) shortcut.push('Alt');
 	if (aEvent.ctrlKey) shortcut.push(XULAppInfo.OS == 'Darwin' ? 'Control' : 'Ctrl');
-	if (aEvent.metaKey) shortcut.push(XULAppInfo.OS == 'Darwin' ? 'Command' : 'Meta' );
+	if (aEvent.metaKey) shortcut.push(XULAppInfo.OS == 'Darwin' ? /* 'Command' */ '\u2318' : 'Meta' );
 	if (aEvent.shiftKey) shortcut.push('Shift');
 	if (aEvent.charCode) shortcut.push(String.fromCharCode(aEvent.charCode));
 	if (aEvent.keyCode) shortcut.push(this._keyNameFromKeyCode(aEvent.keyCode));
