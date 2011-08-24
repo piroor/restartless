@@ -1,7 +1,7 @@
 /**
  * @fileOverview Bootstrap code for restartless addons
  * @author       SHIMODA "Piro" Hiroshi
- * @version      1
+ * @version      2
  *
  * @description
  *   This provides ability to load a script file placed to "modules/main.js".
