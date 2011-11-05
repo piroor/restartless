@@ -134,7 +134,7 @@ var WindowManager = {
 			// By the bug 156333, we cannot find windows by their Z order on Linux.
 			// https://bugzilla.mozilla.org/show_bug.cgi?id=156333
 			if (!windows.hasMoreElements())
-				windows = this.WINMAN.getEnumerator(aType || null);
+				windows = _WindowMediator.getEnumerator(aType || null);
 
 			while (windows.hasMoreElements())
 			{
