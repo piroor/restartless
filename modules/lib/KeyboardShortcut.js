@@ -93,7 +93,7 @@ KeyboardShortcut.prototype = {
 					.replace(/accel-/gi, XULAppInfo.OS == 'Darwin' ? 'meta' : 'ctrl' )
 					.replace(/option-/gi, 'alt-')
 					.replace(/control-/gi, 'ctrl-')
-					.replace(/command-/gi, 'meta-')
+					.replace(/(command|\u2318)-/gi, 'meta-')
 					.replace(/(?:(?:alt|ctrl|meta|shift)-)+/g, function(aModifiers) {
 						return aModifiers.replace(/-$/, '').split('-').sort().join('-')+'-';
 					})
