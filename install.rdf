@@ -6,7 +6,7 @@
                    em:id="restartless@piro.sakura.ne.jp"
                    em:name="Restartless Addon"
                    em:version="0.1"
-                   em:creator="SHIMODA Hiroshi"
+                   em:creator="YUKI &quot;Piro&quot; Hiroshi"
                    em:description="A template for restartless addons."
                    em:homepageURL=""
                    em:optionsURL="about:blank?restartless-config"
@@ -20,7 +20,7 @@
                        em:name="Restartless Addon"
                        em:description="A template for restartless addons."
                        em:homepageURL=""
-                       em:creator="SHIMODA Hiroshi">
+                       em:creator="YUKI &quot;Piro&quot; Hiroshi">
       </RDF:Description>
     </em:localized>
 
