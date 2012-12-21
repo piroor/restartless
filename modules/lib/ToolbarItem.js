@@ -339,7 +339,7 @@ ToolbarItem.BASIC_ITEM_CLASS = 'toolbarbutton-1 chromeclass-toolbar-additional';
 ToolbarItem.XULNS = 'http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul';
 
 /**
- * @param {aSource} aSource
+ * @param {Object} aSource
  *   A source of a XUL element for a toolbar item as a string or something.
  * @param {nsIDOMNode} aOwner
  *   A owner document or a toolbar element which becomes to the parent of the created item.
@@ -360,7 +360,7 @@ ToolbarItem.create = function(aSource, aOwner, aOptions) {
 };
 
 /**
- * @param {aSource} aSource
+ * @param {Object} aSource
  *   A source of a XUL document fragment as a string or something.
  * @param {nsIDOMNode} aOwner
  *   A owner document or a XUL element which becomes to the parent of the created document fragment.
