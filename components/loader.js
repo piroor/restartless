@@ -65,7 +65,9 @@ function load(aURISpec, aExportTargetForImport, aExportTargetForRequire, aRoot)
 			.loadSubScript(aURISpec, ns);
 	}
 	catch(e) {
-		dump('Loader::load('+aURISpec+') failed!\n'+e+'\n');
+		let message = 'Loader::load('+aURISpec+') failed!\n'+e+'\n';
+		dump(message);
+		Components.utils.reportError(message + e.stack);
 		throw e;
 	}
 	_exportForImport(ns, aExportTargetForImport);
@@ -282,7 +284,9 @@ function _callHandler(aHandler, aReason)
 				_namespaces[i][aHandler](aReason);
 		}
 		catch(e) {
-			dump(i+'('+aHandler+', '+aReason+')\n'+e+'\n');
+			let message = i+'('+aHandler+', '+aReason+')\n'+e+'\n';
+			dump(message);
+			Components.utils.reportError(message + e.stack);
 		}
 	}
 }
