@@ -64,20 +64,21 @@ function handleWindow(aWindow)
 	range.selectNodeContents(doc.documentElement);
 	range.collapse(false);
 
-	var fragment = range.createContextualFragment(<![CDATA[
-			<label id="helloworld" value="hello, world!"
-				style="background: white; color: blue;"/>
-		]]>.toString());
+	var fragment = range.createContextualFragment(
+			'<label id="helloworld" value="hello, world!"' +
+			'	style="background: white; color: blue;"/>'
+		);
 	range.insertNode(fragment);
 
 	range.detach();
 
 	/* sample: customizable toolbar button */
-	ToolbarItem.create(<>
-		<toolbarbutton id="restartless-test-button">
-			<label value={bundle.getString('message')}/>
-		</toolbarbutton>
-	</>, doc.getElementById('nav-bar'));
+	ToolbarItem.create(
+		'<toolbarbutton id="restartless-test-button">' +
+		'	<label value=' + bundle.getString('message').quote() + '/>' +
+		'</toolbarbutton>',
+		doc.getElementById('nav-bar')
+	);
 
 	/* sample: keyboard shortcut */
 	KeyboardShortcut.create({
