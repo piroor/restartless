@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <?xml-stylesheet href="chrome://global/skin/"?>
-<!DOCTYPE prefwindow SYSTEM "chrome://restartless/locale/messages.dtd"?>
+<!DOCTYPE prefwindow SYSTEM "chrome://restartless/locale/messages.dtd">
 <prefwindow id="restartless-config"
 	xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
 	title="&config.title;">
