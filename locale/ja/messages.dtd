@@ -1,0 +1,5 @@
+<!ENTITY config.title       "設定ダイアログ">
+<!ENTITY config.general     "全般">
+<!ENTITY config.testBoolean "真偽値の設定">
+<!ENTITY config.appearance  "外観">
+<!ENTITY config.testInteger "整数値の設定">

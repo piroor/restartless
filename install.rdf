@@ -9,7 +9,7 @@
                    em:creator="YUKI &quot;Piro&quot; Hiroshi"
                    em:description="A template for restartless addons."
                    em:homepageURL=""
-                   em:optionsURL="about:blank?restartless-config"
+                   em:optionsURL="chrome://restartless/content/config.xul"
                    em:bootstrap="true">
 
     <em:updateURL></em:updateURL>

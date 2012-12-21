@@ -1,0 +1,5 @@
+<!ENTITY config.title       "Configuration Dialog">
+<!ENTITY config.general     "General">
+<!ENTITY config.testBoolean "This is a boolean setting.">
+<!ENTITY config.appearance  "Appearance">
+<!ENTITY config.testInteger "This is an integer.">
