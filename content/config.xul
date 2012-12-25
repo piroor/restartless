@@ -70,11 +70,23 @@
 				type="number"
 				preference="testInteger"/>
 		</hbox>
+		<label value="{{ messages.getString('config.labelFromProperties')
+		                 /* this is resolved by labelBundle.js */ }}"/>
 
 	</prefpane>
 
 	<script type="application/javascript"><![CDATA[
 		function initGeneralPane() {
 		}
+	]]></script>
+
+	<!-- label library must be loaded at the end, after all other scripts are loaded -->
+	<stringbundleset>
+		<stringbundle id="messages" src="chrome://restartless/locale/messages.properties"/>
+	</stringbundleset>
+	<script type="application/javascript"><![CDATA[
+		Components.classes['@mozilla.org/moz/jssubscript-loader;1']
+			.getService(Components.interfaces.mozIJSSubScriptLoader)
+			.loadSubScript('resource://restartless-resources/modules/lib/easyTemplate.js', window);
 	]]></script>
 </prefwindow>
