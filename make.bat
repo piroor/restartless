@@ -2,6 +2,6 @@ setlocal
 set appname=restartless
 
 copy buildscript\makexpi.sh .\
-bash makexpi.sh %appname% version=0
+bash makexpi.sh -n %appname% -o
 del makexpi.sh
 endlocal
