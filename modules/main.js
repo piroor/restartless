@@ -19,6 +19,8 @@ load('lib/jsdeferred');
 load('lib/WindowManager');
 load('lib/ToolbarItem');
 load('lib/KeyboardShortcut');
+load('lib/here');
+load('lib/easyTemplate');
 // this.import() also available instead of load(), as an alias.
 // Note: don't use simply "import()" without the prefix "this.",
 // because the keyword "import" will be a reserved word in future.
@@ -53,6 +55,7 @@ dump(bundle.getString('message')+'\n');
  */
 const TYPE_BROWSER = 'navigator:browser';
 
+var global = this;
 function handleWindow(aWindow)
 {
 	var doc = aWindow.document;
@@ -64,19 +67,21 @@ function handleWindow(aWindow)
 	range.selectNodeContents(doc.documentElement);
 	range.collapse(false);
 
-	var fragment = range.createContextualFragment(
-			'<label id="helloworld" value="hello, world!"' +
-			'	style="background: white; color: blue;"/>'
-		);
+	var fragment = range.createContextualFragment(here(/*
+			<label id="helloworld" value="hello, world!"
+				style="background: white; color: blue;"/>
+		*/));
 	range.insertNode(fragment);
 
 	range.detach();
 
 	/* sample: customizable toolbar button */
 	ToolbarItem.create(
-		'<toolbarbutton id="restartless-test-button">' +
-		'	<label value=' + bundle.getString('message').quote() + '/>' +
-		'</toolbarbutton>',
+		easyTemplate.apply(here(/*
+		<toolbarbutton id="restartless-test-button">
+			<label value={{ JSON.stringify(bundle.getString('message')) }}/>
+		</toolbarbutton>
+		*/), global),
 		doc.getElementById('nav-bar')
 	);
 
@@ -122,4 +127,7 @@ function shutdown()
 	KeyboardShortcut = undefined;
 	timer = undefined;
 	bundle = undefined;
+	here = undefined;
+	easyTemplate = undefined;
+	global = undefined;
 }
