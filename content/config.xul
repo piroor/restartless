@@ -2,7 +2,7 @@
 <!--
  - @fileOverview configuration dialog for restartless addons
  - @author       YUKI "Piro" Hiroshi
- - @version      1
+ - @version      2
  -
  - @license
  -   The MIT License, Copyright (c) 2010 YUKI "Piro" Hiroshi.
@@ -64,5 +64,6 @@
 		Components.classes['@mozilla.org/moz/jssubscript-loader;1']
 			.getService(Components.interfaces.mozIJSSubScriptLoader)
 			.loadSubScript('resource://restartless-resources/modules/lib/easyTemplate.js', window);
+		easyTemplate.apply();
 	]]></script>
 </prefwindow>
