@@ -10,7 +10,8 @@
                    em:description="A template for restartless addons."
                    em:homepageURL=""
                    em:optionsURL="chrome://restartless/content/config.xul"
-                   em:bootstrap="true">
+                   em:bootstrap="true"
+                   em:type="2">
 
     <em:updateURL></em:updateURL>
     <em:updateKey></em:updateKey>
