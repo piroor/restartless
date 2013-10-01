@@ -82,7 +82,8 @@ function _free()
 	_gLoader =
 	_load =
 	_reasonToString =
-	_free = _gResourceRegistered =
+	_free =
+	_gResourceRegistered =
 	install =
 	uninstall =
 	startup =
