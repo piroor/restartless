@@ -10,20 +10,21 @@
  */
 
 /** You can customize shared properties for loaded scripts. */
+var Application = (function() {
+	if ('@mozilla.org/fuel/application;1' in Components.classes)
+		return Components.classes['@mozilla.org/fuel/application;1']
+				.getService(Components.interfaces.fuelIApplication);
+	if ('@mozilla.org/steel/application;1' in Components.classes)
+		return Components.classes['@mozilla.org/steel/application;1']
+				.getService(Components.interfaces.steelIApplication);
+	return null;
+})();
 var _namespacePrototype = {
 		Cc : Components.classes,
 		Ci : Components.interfaces,
 		Cu : Components.utils,
 		Cr : Components.results,
-		Application : (
-			'@mozilla.org/fuel/application;1' in Components.classes ?
-				Components.classes['@mozilla.org/fuel/application;1']
-					.getService(Components.interfaces.fuelIApplication) :
-			'@mozilla.org/steel/application;1' in Components.classes ?
-				Components.classes['@mozilla.org/steel/application;1']
-					.getService(Components.interfaces.steelIApplication) :
-			null
-		)
+		Application : Application
 	};
 var _namespaces;
 
@@ -374,6 +375,8 @@ function shutdown(aReason)
 		}
 	}
 	_namespaces = void(0);
+	_namespacePrototype = void(0);
+	Application = void(0);
 
 	IOService = void(0);
 	FileHandler = void(0);
