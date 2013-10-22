@@ -1,3 +1,8 @@
 content restartless content/
 locale restartless en-US locale/en-US/
 locale restartless ja locale/ja/
+
+# These derectives are ignored when this is loaded as a bootstrapped addon.
+component	{ea952e00-3b04-11e3-aa6e-0800200c9a66}	components/bundled.js
+contract	@piro.sakura.ne.jp/restartless/bundled;1	{ea952e00-3b04-11e3-aa6e-0800200c9a66}
+category	profile-after-change	restartless@piro.sakura.ne.jp_BundledService	@piro.sakura.ne.jp/restartless/bundled;1
