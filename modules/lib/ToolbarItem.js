@@ -312,13 +312,13 @@ ToolbarItem.prototype = {
 	_onBeforeCustomization : function()
 	{
 		if (this._definition && this._definition.onDestroy && this.inserted)
-			this._definition.onDestroy();
+			this._definition.onDestroy.call(this);
 	},
 
 	_onAfterCustomization : function()
 	{
 		if (this._definition && this._definition.onInit && this.inserted)
-			this._definition.onInit();
+			this._definition.onInit.call(this);
 	},
 
 
