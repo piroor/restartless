@@ -83,11 +83,13 @@ function handleWindow(aWindow)
 		</toolbarbutton>
 		*/), global),
 		doc.getElementById('nav-bar'),
-		onInit : function() {
-			Application.console.log('restartless-test-button: inserted ' + this.node);
-		},
-		onDestroy : function() {
-			Application.console.log('restartless-test-button: going to be removed: ' + this.node);
+		{ // options
+			onInit : function() {
+				Application.console.log('restartless-test-button: inserted ' + this.node);
+			},
+			onDestroy : function() {
+				Application.console.log('restartless-test-button: going to be removed: ' + this.node);
+			}
 		}
 	);
 
