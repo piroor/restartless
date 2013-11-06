@@ -1,7 +1,7 @@
 /**
  * @fileOverview Toolbar item module for restartless addons
  * @author       YUKI "Piro" Hiroshi
- * @version      5
+ * @version      6
  *
  * @license
  *   The MIT License, Copyright (c) 2011-2012 YUKI "Piro" Hiroshi.
