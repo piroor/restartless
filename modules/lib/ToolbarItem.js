@@ -144,7 +144,7 @@ ToolbarItem.prototype = {
 
 		if (aDefinition.ondestroy && !aDefinition.onDestroy)
 			aDefinition.onDestroy = aDefinition.ondestroy;
-		if (aDefinition.destroy && !aDefinition.onInit)
+		if (aDefinition.destroy && !aDefinition.onDestroy)
 			aDefinition.onDestroy = aDefinition.destroy;
 
 		if (aDefinition.toolbar && aDefinition.toolbar instanceof Ci.nsIDOMElement)
