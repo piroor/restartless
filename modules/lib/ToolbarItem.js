@@ -311,14 +311,14 @@ ToolbarItem.prototype = {
 
 	_onBeforeCustomization : function()
 	{
-		if (this._definition && this._definition.destroy && this.inserted)
-			this._definition.destroy();
+		if (this._definition && this._definition.onDestroy && this.inserted)
+			this._definition.onDestroy();
 	},
 
 	_onAfterCustomization : function()
 	{
-		if (this._definition && this._definition.destroy && this.inserted)
-			this._definition.init();
+		if (this._definition && this._definition.onInit && this.inserted)
+			this._definition.onInit();
 	},
 
 
