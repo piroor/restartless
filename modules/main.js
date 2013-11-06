@@ -82,7 +82,13 @@ function handleWindow(aWindow)
 			<label value={{ JSON.stringify(bundle.getString('message')) }}/>
 		</toolbarbutton>
 		*/), global),
-		doc.getElementById('nav-bar')
+		doc.getElementById('nav-bar'),
+		onInit : function() {
+			Application.console.log('restartless-test-button: inserted ' + this.node);
+		},
+		onDestroy : function() {
+			Application.console.log('restartless-test-button: going to be removed: ' + this.node);
+		}
 	);
 
 	/* sample: keyboard shortcut */
