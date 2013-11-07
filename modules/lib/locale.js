@@ -1,10 +1,10 @@
 /**
  * @fileOverview Locale module for restartless addons
  * @author       YUKI "Piro" Hiroshi
- * @version      5
+ * @version      6
  *
  * @license
- *   The MIT License, Copyright (c) 2010-2012 YUKI "Piro" Hiroshi.
+ *   The MIT License, Copyright (c) 2010-2013 YUKI "Piro" Hiroshi.
  *   https://github.com/piroor/restartless/blob/master/license.txt
  * @url http://github.com/piroor/restartless
  */
@@ -68,6 +68,7 @@ StringBundle.prototype = {
 			return this._bundle.GetStringFromName(aKey);
 		}
 		catch(e) {
+			Cu.reportError(e);
 		}
 		return '';
 	},
@@ -76,6 +77,7 @@ StringBundle.prototype = {
 			return this._bundle.formatStringFromName(aKey, aArray, aArray.length);
 		}
 		catch(e) {
+			Cu.reportError(e);
 		}
 		return '';
 	},
