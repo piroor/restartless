@@ -1,7 +1,7 @@
 /**
  * @fileOverview Locale module for restartless addons
  * @author       YUKI "Piro" Hiroshi
- * @version      6
+ * @version      7
  *
  * @license
  *   The MIT License, Copyright (c) 2010-2013 YUKI "Piro" Hiroshi.
@@ -68,7 +68,7 @@ StringBundle.prototype = {
 			return this._bundle.GetStringFromName(aKey);
 		}
 		catch(e) {
-			Cu.reportError(e);
+			Cu.reportError(new Error('locale.js: failed to call GetStringFromName() with: ' + aKey + '\n' + e));
 		}
 		return '';
 	},
@@ -77,6 +77,7 @@ StringBundle.prototype = {
 			return this._bundle.formatStringFromName(aKey, aArray, aArray.length);
 		}
 		catch(e) {
+			Cu.reportError(new Error('locale.js: failed to call formatStringFromName() with: ' + JSON.stringify({ key: aKey, args: aArray }) + '\n' + e));
 			Cu.reportError(e);
 		}
 		return '';
