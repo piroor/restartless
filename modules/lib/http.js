@@ -1,7 +1,7 @@
 /**
  * @fileOverview XMLHttpRequest wrapper module for restartless addons
  * @author       YUKI "Piro" Hiroshi
- * @version      2
+ * @version      3
  * @description  
  *
  * @license
@@ -13,10 +13,16 @@
 var EXPORTED_SYMBOLS = [
   'get',
   'post',
+  'RESPONSE_TYPE',
   'RESPONSE_CONTENT_TYPE'
 ];
 
-var RESPONSE_CONTENT_TYPE = 'X-Override-Content-Type';
+var RESPONSE_TYPE         = 'X-Response-Type';
+var RESPONSE_CONTENT_TYPE = 'X-Response-Content-Type';
+
+var PSEUDO_HEADERS = [
+  RESPONSE_CONTENT_TYPE
+];
 
 var Deferred = require('jsdeferred').Deferred;
 
@@ -44,6 +50,13 @@ function sendRequest(aParams) {
   var uri      = aParams.uri || null;
   var headers  = aParams.headers || {};
   var postData = aParams.postData || null;
+  var responseType = aParams.responseType || '';
+  var responseContentType = aParams.responseContentType || null;
+
+  if (headers[RESPONSE_TYPE])
+    responseType = headers[RESPONSE_TYPE];
+  if (headers[RESPONSE_CONTENT_TYPE])
+    responseContentType = headers[RESPONSE_CONTENT_TYPE];
 
   if (!uri)
     throw new Error('no URL');
@@ -93,18 +106,13 @@ function sendRequest(aParams) {
                 .createInstance(Ci.nsIXMLHttpRequest)
                 .QueryInterface(Ci.nsIDOMEventTarget);
     request.open(method, uri, true);
-    request.addEventListener('load', listener, false);
-    request.addEventListener('error', listener, false);
+    if (responseType)
+      request.responseType = responseType;
+    if (responseContentType)
+      request.overrideMimeType(responseContentType);
     Object.keys(headers).forEach(function(aKey) {
-      switch (aKey) {
-        case RESPONSE_CONTENT_TYPE:
-          request.overrideMimeType(headers[aKey]);
-          break;
-
-        default:
-          request.setRequestHeader(aKey, headers[aKey]);
-          break;
-      }
+      if (PSEUDO_HEADERS.indexOf(aKey) < 0)
+        request.setRequestHeader(aKey, headers[aKey]);
     });
     request.send(postData);
   });
