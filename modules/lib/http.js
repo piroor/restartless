@@ -1,7 +1,7 @@
 /**
  * @fileOverview XMLHttpRequest wrapper module for restartless addons
  * @author       YUKI "Piro" Hiroshi
- * @version      3
+ * @version      4
  * @description
  *   // get as a text
  *   http.get('http://.....',
