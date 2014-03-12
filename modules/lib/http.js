@@ -1,7 +1,7 @@
 /**
  * @fileOverview XMLHttpRequest wrapper module for restartless addons
  * @author       YUKI "Piro" Hiroshi
- * @version      5
+ * @version      6
  * @description
  *   // get as a text
  *   http.get('http://.....',
@@ -26,6 +26,10 @@
  *         console.log(bodyBase64);
  *       });
  *   // See also: https://developer.mozilla.org/docs/XMLHttpRequest/Sending_and_Receiving_Binary_Data
+ *   
+ *   http.postAsJSON('http://.....', { a: true, b: 29 })
+ *       .next(function(aResponse) {
+ *       });
  *
  * @license
  *   The MIT License, Copyright (c) 2014 YUKI "Piro" Hiroshi.
@@ -38,6 +42,7 @@ var EXPORTED_SYMBOLS = [
   'getAsJSON',
   'getAsBinary',
   'post',
+  'postAsJSON',
   'RESPONSE_TYPE',
   'RESPONSE_CONTENT_TYPE'
 ];
@@ -52,6 +57,15 @@ var PSEUDO_HEADERS = [
 
 var Deferred = require('jsdeferred').Deferred;
 
+function clone(aObject) {
+  var cloned = {};
+  Object.keys(aObject).forEach(function(aKey) {
+    cloned[aKey] = aObject[aKey];
+  });
+  return cloned;
+}
+
+
 function get(aURI, aHeaders) {
   return sendRequest({
     method:  'GET',
@@ -61,19 +75,13 @@ function get(aURI, aHeaders) {
 }
 
 function getAsJSON(aURI, aHeaders) {
-  var headers = {};
-  Object.keys(aHeaders).forEach(function(aKey) {
-    headers[aKey] = aHeaders[aKey];
-  });
+  var headers = clone(aHeaders);
   headers[RESPONSE_TYPE] = 'json';
   return get(aURI, headers);
 }
 
 function getAsBinary(aURI, aHeaders) {
-  var headers = {};
-  Object.keys(aHeaders).forEach(function(aKey) {
-    headers[aKey] = aHeaders[aKey];
-  });
+  var headers = clone(aHeaders);
   headers[RESPONSE_TYPE] = 'arraybuffer';
   return get(aURI, headers);
 }
@@ -86,6 +94,14 @@ function post(aURI, aPostData, aHeaders) {
     postData: aPostData
   });
 }
+
+function postAsJSON(aURI, aPostData, aHeaders) {
+  var headers = clone(aHeaders);
+  var postData = JSON.stringify(aPostData);
+  headers['Content-Type'] = 'application/json';
+  return post(aURI, aPostData, headers);
+}
+
 
 function ArrayBufferRespone(aResponse) {
   this._raw = aResponse;
