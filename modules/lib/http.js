@@ -178,7 +178,8 @@ function sendRequest(aParams) {
       try {
         deferred.fail(new Error(JSON.stringify({
           statusCode: request.status,
-          body:       request.responseText,
+          statusText: request.statusText,
+          body:       request.response,
           event:      {
             type:   aEvent.type,
             detail: aEvent.detail
