@@ -1,10 +1,10 @@
 /**
  * @fileOverview Loader module for restartless addons
  * @author       YUKI "Piro" Hiroshi
- * @version      6
+ * @version      7
  *
  * @license
- *   The MIT License, Copyright (c) 2010-2012 YUKI "Piro" Hiroshi.
+ *   The MIT License, Copyright (c) 2010-2014 YUKI "Piro" Hiroshi.
  *   https://github.com/piroor/restartless/blob/master/license.txt
  * @url http://github.com/piroor/restartless
  */
@@ -24,7 +24,13 @@ var _namespacePrototype = {
 		Ci : Components.interfaces,
 		Cu : Components.utils,
 		Cr : Components.results,
-		Application : Application
+		Application : Application,
+		btoa: function(aInput) {
+		  return btoa(aInput);
+		},
+		atob: function(aInput) {
+		  return atob(aInput);
+		}
 	};
 var _namespaces;
 
