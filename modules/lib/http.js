@@ -21,6 +21,7 @@ var RESPONSE_TYPE         = 'X-Response-Type';
 var RESPONSE_CONTENT_TYPE = 'X-Response-Content-Type';
 
 var PSEUDO_HEADERS = [
+  RESPONSE_TYPE,
   RESPONSE_CONTENT_TYPE
 ];
 
