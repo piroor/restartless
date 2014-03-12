@@ -58,6 +58,7 @@ var PSEUDO_HEADERS = [
 var Deferred = require('jsdeferred').Deferred;
 
 function clone(aObject) {
+  aObject = aObject || {};
   var cloned = {};
   Object.keys(aObject).forEach(function(aKey) {
     cloned[aKey] = aObject[aKey];
