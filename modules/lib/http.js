@@ -2,7 +2,29 @@
  * @fileOverview XMLHttpRequest wrapper module for restartless addons
  * @author       YUKI "Piro" Hiroshi
  * @version      3
- * @description  
+ * @description
+ *   // get as a text
+ *   http.get('http://.....',
+ *            { 'X-Response-Content-Type': 'text/plain; charset=EUC-JP' })
+ *       .next(function(aResponse) {
+ *         console.log(aResponse.responseText);
+ *       });
+ *   
+ *   // get as a JSON
+ *   http.get('http://.....', { 'X-Response-Type': 'json' })
+ *       .next(function(aResponse) {
+ *         var body = aResponse.response;
+ *         console.log(function);
+ *       });
+ *   
+ *   // get as a binary
+ *   http.get('http://.....', { 'X-Response-Type': 'arraybuffer' })
+ *       .next(function(aResponse) {
+ *         var bodyBytesArray = aResponse.responseText;
+ *         var bodyBase64 = btoa(bodyBytesArray);
+ *         console.log(bodyBase64);
+ *       });
+ *   // See also: https://developer.mozilla.org/docs/XMLHttpRequest/Sending_and_Receiving_Binary_Data
  *
  * @license
  *   The MIT License, Copyright (c) 2014 YUKI "Piro" Hiroshi.
@@ -44,6 +66,41 @@ function post(aURI, aPostData, aHeaders) {
   });
 }
 
+function ArrayBufferRespone(aResponse) {
+  this._raw = aResponse;
+  this._init();
+}
+ArrayBufferRespone.prototype = {
+  _init: function() {
+    for (let key in this._raw) {
+      if (key in this)
+        continue;
+      this._bind(key);
+    }
+  },
+  _bind: function(aName) {
+    if (typeof this._raw[aName] == 'function') {
+      this[aName] = this._raw[aName].bind(this._raw);
+    } else {
+      this.__defineGetter__(aName, function() {
+        return this._raw[aName];
+      });
+    }
+  },
+  get responseText() {
+    var bytesArray = ''
+    var bytes = new Uint8Array(this._raw.response);
+    for (let i = 0, maxi = bytes.byteLength; i < maxi; i++) {
+      bytesArray += String.fromCharCode(bytes[i]);
+    }
+    return bytesArrya;
+  },
+  get responseXML() {
+    // accessing to the property raises InvalidStateError, so I have to define this staticly
+    return this._raw.responseXML;
+  }
+};
+
 function sendRequest(aParams) {
   var deferred = new Deferred();
 
@@ -75,7 +132,10 @@ function sendRequest(aParams) {
     request.removeEventListener('error', listener, false);
 
     if (request.status == 200) {
-      deferred.call(request);
+      if (responseType == 'arraybuffer')
+        deferred.call(new ArrayBufferRespone(request));
+      else
+        deferred.call(request);
     } else {
       try {
         deferred.fail(new Error(JSON.stringify({
