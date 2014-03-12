@@ -1,7 +1,7 @@
 /**
  * @fileOverview XMLHttpRequest wrapper module for restartless addons
  * @author       YUKI "Piro" Hiroshi
- * @version      4
+ * @version      5
  * @description
  *   // get as a text
  *   http.get('http://.....',
@@ -11,15 +11,16 @@
  *       });
  *   
  *   // get as a JSON
- *   http.get('http://.....', { 'X-Response-Type': 'json' })
+ *   http.getAsJSON('http://.....')
  *       .next(function(aResponse) {
  *         var body = aResponse.response;
  *         console.log(function);
  *       });
  *   
  *   // get as a binary
- *   http.get('http://.....', { 'X-Response-Type': 'arraybuffer' })
+ *   http.getAsBinary('http://.....')
  *       .next(function(aResponse) {
+ *         // arraybyffer = aResponse.response;
  *         var bodyBytesArray = aResponse.responseText;
  *         var bodyBase64 = btoa(bodyBytesArray);
  *         console.log(bodyBase64);
@@ -34,6 +35,8 @@
 
 var EXPORTED_SYMBOLS = [
   'get',
+  'getAsJSON',
+  'getAsBinary',
   'post',
   'RESPONSE_TYPE',
   'RESPONSE_CONTENT_TYPE'
@@ -55,6 +58,24 @@ function get(aURI, aHeaders) {
     uri:     aURI,
     headers: aHeaders
   });
+}
+
+function getAsJSON(aURI, aHeaders) {
+  var headers = {};
+  Object.keys(aHeaders).forEach(function(aKey) {
+    headers[aKey] = aHeaders[aKey];
+  });
+  headers[RESPONSE_TYPE] = 'json';
+  return get(aURI, headers);
+}
+
+function getAsBinary(aURI, aHeaders) {
+  var headers = {};
+  Object.keys(aHeaders).forEach(function(aKey) {
+    headers[aKey] = aHeaders[aKey];
+  });
+  headers[RESPONSE_TYPE] = 'arraybuffer';
+  return get(aURI, headers);
 }
 
 function post(aURI, aPostData, aHeaders) {
