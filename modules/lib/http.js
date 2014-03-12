@@ -87,17 +87,7 @@ function sendRequest(aParams) {
           }
         })));
       } catch(error) {
-        deferred.fail(new Error(JSON.stringify({
-          error: {
-            name:    error.name,
-            message: error.message,
-            error:   error
-          },
-          event: {
-            type:   aEvent.type,
-            detail: aEvent.detail
-          }
-        })));
+        deferred.fail(error);
       }
     }
   };
@@ -118,6 +108,8 @@ function sendRequest(aParams) {
     request.addEventListener('load', listener, false);
     request.addEventListener('error', listener, false);
     request.send(postData);
+  }).error(function(aError) {
+    deferred.fail(aError);
   });
 
   return deferred;
