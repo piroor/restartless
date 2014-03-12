@@ -115,6 +115,8 @@ function sendRequest(aParams) {
       if (PSEUDO_HEADERS.indexOf(aKey) < 0)
         request.setRequestHeader(aKey, headers[aKey]);
     });
+    request.addEventListener('load', listener, false);
+    request.addEventListener('error', listener, false);
     request.send(postData);
   });
 
