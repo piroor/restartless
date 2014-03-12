@@ -15,7 +15,7 @@ var EXPORTED_SYMBOLS = [
   'post'
 ];
 
-var Deferred = require('./jsdeferred').Deferred;
+var Deferred = require('jsdeferred').Deferred;
 
 function get(aURI, aHeaders) {
   return sendRequest({
