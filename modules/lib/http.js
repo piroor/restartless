@@ -1,7 +1,7 @@
 /**
  * @fileOverview XMLHttpRequest wrapper module for restartless addons
  * @author       YUKI "Piro" Hiroshi
- * @version      1
+ * @version      2
  * @description  
  *
  * @license
@@ -12,8 +12,11 @@
 
 var EXPORTED_SYMBOLS = [
   'get',
-  'post'
+  'post',
+  'RESPONSE_CONTENT_TYPE'
 ];
+
+var RESPONSE_CONTENT_TYPE = 'X-Override-Content-Type';
 
 var Deferred = require('jsdeferred').Deferred;
 
@@ -93,7 +96,15 @@ function sendRequest(aParams) {
     request.addEventListener('load', listener, false);
     request.addEventListener('error', listener, false);
     Object.keys(headers).forEach(function(aKey) {
-      request.setRequestHeader(aKey, headers[aKey]);
+      switch (aKey) {
+        case RESPONSE_CONTENT_TYPE:
+          request.overrideMimeType(headers[aKey]);
+          break;
+
+        default:
+          request.setRequestHeader(aKey, headers[aKey]);
+          break;
+      }
     });
     request.send(postData);
   });
