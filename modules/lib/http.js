@@ -131,7 +131,7 @@ ArrayBufferRespone.prototype = {
     for (let i = 0, maxi = bytes.byteLength; i < maxi; i++) {
       bytesArray += String.fromCharCode(bytes[i]);
     }
-    return bytesArrya;
+    return bytesArray;
   },
   get responseXML() {
     // accessing to the property raises InvalidStateError, so I have to define this staticly
