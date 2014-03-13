@@ -1,7 +1,7 @@
 /**
  * @fileOverview XMLHttpRequest wrapper module for restartless addons
  * @author       YUKI "Piro" Hiroshi
- * @version      7
+ * @version      8
  * @description
  *   // get as a text
  *   http.get('http://.....',
@@ -191,6 +191,18 @@ function sendRequest(aParams) {
     });
     request.addEventListener('load', listener, false);
     request.addEventListener('error', listener, false);
+
+    if (postData &&
+        typeof postData == 'object' &&
+        !(postData instanceof Ci.nsISupports))
+      postData = JSON.stringify(postData);
+
+    if (typeof postData == 'string') {
+      let postDataStream = Cc['@mozilla.org/io/string-input-stream;1']
+                             .createInstance(Ci.nsIStringInputStream);
+      postDataStream.data = postData;
+      postData = postDataStream;
+    }
     request.send(postData);
   }).error(function(aError) {
     deferred.fail(aError);
