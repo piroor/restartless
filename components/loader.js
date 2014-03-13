@@ -1,7 +1,7 @@
 /**
  * @fileOverview Loader module for restartless addons
  * @author       YUKI "Piro" Hiroshi
- * @version      7
+ * @version      8
  *
  * @license
  *   The MIT License, Copyright (c) 2010-2014 YUKI "Piro" Hiroshi.
@@ -19,6 +19,8 @@ var Application = (function() {
 				.getService(Components.interfaces.steelIApplication);
 	return null;
 })();
+// import base64 utilities from the js code module namespace
+var { atob, btoa } = Components.utils.import('resource://gre/modules/Services.jsm', {});
 var _namespacePrototype = {
 		Cc : Components.classes,
 		Ci : Components.interfaces,
@@ -26,10 +28,10 @@ var _namespacePrototype = {
 		Cr : Components.results,
 		Application : Application,
 		btoa: function(aInput) {
-		  return btoa(aInput);
+			return btoa(aInput);
 		},
 		atob: function(aInput) {
-		  return atob(aInput);
+			return atob(aInput);
 		}
 	};
 var _namespaces;
