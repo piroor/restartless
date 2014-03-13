@@ -1,7 +1,7 @@
 /**
  * @fileOverview Loader module for restartless addons
  * @author       YUKI "Piro" Hiroshi
- * @version      9
+ * @version      10
  *
  * @license
  *   The MIT License, Copyright (c) 2010-2014 YUKI "Piro" Hiroshi.
@@ -20,14 +20,23 @@ var Application = (function() {
 	return null;
 })();
 // import base64 utilities from the js code module namespace
-var { atob, btoa, console } = Components.utils.import('resource://gre/modules/Services.jsm', {});
+try {
+  var { atob, btoa } = Components.utils.import('resource://gre/modules/Services.jsm', {});
+} catch(e) {
+  Components.utils.reportError(new Error('failed to load Services.jsm'));
+}
+try {
+  var { console } = Components.utils.import('resource://gre/modules/devtools/Console.jsm', {});
+} catch(e) {
+  Components.utils.reportError(new Error('failed to load Console.jsm'));
+}
 var _namespacePrototype = {
 		Cc : Components.classes,
 		Ci : Components.interfaces,
 		Cu : Components.utils,
 		Cr : Components.results,
 		Application : Application,
-		console : console || Application.console,
+		console : this.console,
 		btoa    : function(aInput) {
 			return btoa(aInput);
 		},
