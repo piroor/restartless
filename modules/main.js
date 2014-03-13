@@ -78,7 +78,7 @@ function handleWindow(aWindow)
 	/* sample: customizable toolbar button */
 	ToolbarItem.create(
 		easyTemplate.apply(here(/*
-		<toolbarbutton id="restartless-test-button">
+		<toolbarbutton id="restartless-test-button" oncommand="alert('hello!');">
 			<label value={{ JSON.stringify(bundle.getString('message')) }}/>
 		</toolbarbutton>
 		*/), global),
