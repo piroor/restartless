@@ -27,7 +27,7 @@ var _namespacePrototype = {
 		Cu : Components.utils,
 		Cr : Components.results,
 		Application : Application,
-		console : console,
+		console : console || Application.console,
 		btoa    : function(aInput) {
 			return btoa(aInput);
 		},
