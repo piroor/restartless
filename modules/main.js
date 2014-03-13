@@ -35,6 +35,8 @@ timer.setTimeout(function() {
 	dump('DELAYED CODE DONE\n');
 }, 500);
 
+var http = require('lib/http');
+
 /**
  * JSDeferred sample.
  */
@@ -76,9 +78,9 @@ function handleWindow(aWindow)
 	range.detach();
 
 	/* sample: customizable toolbar button */
-	ToolbarItem.create(
+	var button = ToolbarItem.create(
 		easyTemplate.apply(here(/*
-		<toolbarbutton id="restartless-test-button" oncommand="alert('hello!');">
+		<toolbarbutton id="restartless-test-button">
 			<label value={{ JSON.stringify(bundle.getString('message')) }}/>
 		</toolbarbutton>
 		*/), global),
@@ -92,6 +94,21 @@ function handleWindow(aWindow)
 			}
 		}
 	);
+	button.addEventListener('command', function(aEvent) {
+		var uri = aWindow.content.location.href;
+		http.getAsBinary(uri)
+			.next(function(aResponse) {
+				aWindow.alert([
+					uri,
+					aResponse.status,
+					aResponse.getAllResponseHeaders(),
+					aResponse.responseText.substring(0, 40) + '...'
+				].join('\n'));
+			})
+			.error(function(aError) {
+				aWindow.alert(aError);
+			});
+	});
 
 	/* sample: keyboard shortcut */
 	KeyboardShortcut.create({
@@ -137,5 +154,6 @@ function shutdown()
 	bundle = undefined;
 	here = undefined;
 	easyTemplate = undefined;
+	http = undefined;
 	global = undefined;
 }
