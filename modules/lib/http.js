@@ -1,7 +1,7 @@
 /**
  * @fileOverview XMLHttpRequest wrapper module for restartless addons
  * @author       YUKI "Piro" Hiroshi
- * @version      6
+ * @version      7
  * @description
  *   // get as a text
  *   http.get('http://.....',
@@ -169,26 +169,11 @@ function sendRequest(aParams) {
     request.removeEventListener('load', listener, false);
     request.removeEventListener('error', listener, false);
 
-    if (request.status == 200) {
-      if (responseType == 'arraybuffer')
-        deferred.call(new ArrayBufferRespone(request));
-      else
-        deferred.call(request);
-    } else {
-      try {
-        deferred.fail(new Error(JSON.stringify({
-          statusCode: request.status,
-          statusText: request.statusText,
-          body:       request.response,
-          event:      {
-            type:   aEvent.type,
-            detail: aEvent.detail
-          }
-        })));
-      } catch(error) {
-        deferred.fail(error);
-      }
-    }
+    var response = request;
+    if (responseType == 'arraybuffer')
+      response = new ArrayBufferRespone(response)
+
+    deferred.call(response);
   };
 
   Deferred.next(function() {
