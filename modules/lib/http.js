@@ -1,7 +1,7 @@
 /**
  * @fileOverview XMLHttpRequest wrapper module for restartless addons
  * @author       YUKI "Piro" Hiroshi
- * @version      8
+ * @version      9
  * @description
  *   // get as a text
  *   http.get('http://.....',
@@ -159,6 +159,9 @@ function sendRequest(aParams) {
 
   var request;
   var listener = function(aEvent) {
+    if (!request || !listener)
+      return;
+
     switch (aEvent.type) {
       case 'load':
       case 'error':
@@ -174,6 +177,9 @@ function sendRequest(aParams) {
       response = new ArrayBufferRespone(response)
 
     deferred.call(response);
+
+    response = undefined;
+    listener = undefined;
   };
 
   Deferred.next(function() {
@@ -191,6 +197,13 @@ function sendRequest(aParams) {
     });
     request.addEventListener('load', listener, false);
     request.addEventListener('error', listener, false);
+
+    deferred.canceller = function() {
+      request.abort();
+
+      response = undefined;
+      listener = undefined;
+    };
 
     if (postData &&
         typeof postData == 'object' &&
