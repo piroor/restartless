@@ -1,10 +1,10 @@
 /**
  * @fileOverview Toolbar item module for restartless addons
  * @author       YUKI "Piro" Hiroshi
- * @version      6
+ * @version      7
  *
  * @license
- *   The MIT License, Copyright (c) 2011-2012 YUKI "Piro" Hiroshi.
+ *   The MIT License, Copyright (c) 2011-2014 YUKI "Piro" Hiroshi.
  *   https://github.com/piroor/restartless/blob/master/license.txt
  * @url http://github.com/piroor/restartless
  */
@@ -264,7 +264,8 @@ ToolbarItem.prototype = {
 		toolbar.setAttribute('currentset', currentset);
 		this._document.persist(toolbar.id, 'currentset');
 
-		toolbar.insertBefore(this.node, this._getLastItemInToolbar(toolbar));
+		var owner = toolbar.customizationTarget || target;
+		owner.insertBefore(this.node, this._getLastItemInToolbar(owner));
 	},
 
 	_getLastItemInToolbar : function(aToolbar)
