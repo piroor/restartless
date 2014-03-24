@@ -162,7 +162,7 @@ function sendRequest(aParams) {
     request.removeEventListener('load', listener, false);
     request.removeEventListener('error', listener, false);
     deferred.canceller = function() {};
-    deferred = listener = request undefined;
+    deferred = listener = request = undefined;
   };
 
   var request;
