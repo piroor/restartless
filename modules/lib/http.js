@@ -1,7 +1,7 @@
 /**
  * @fileOverview XMLHttpRequest wrapper module for restartless addons
  * @author       YUKI "Piro" Hiroshi
- * @version      9
+ * @version      10
  * @description
  *   // get as a text
  *   http.get('http://.....',
@@ -29,6 +29,7 @@
  *   
  *   http.postAsJSON('http://.....', { a: true, b: 29 })
  *       .next(function(aResponse) {
+ *         var responseJSON = JSON.parse(aResponse.responseText);
  *       });
  *
  * @license
@@ -157,6 +158,13 @@ function sendRequest(aParams) {
   if (!uri)
     throw new Error('no URL');
 
+  var cleanup = function() {
+    request.removeEventListener('load', listener, false);
+    request.removeEventListener('error', listener, false);
+    deferred.canceller = function() {};
+    deferred = listener = request undefined;
+  };
+
   var request;
   var listener = function(aEvent) {
     if (!request || !listener)
@@ -169,17 +177,14 @@ function sendRequest(aParams) {
       default:
         return;
     }
-    request.removeEventListener('load', listener, false);
-    request.removeEventListener('error', listener, false);
 
     var response = request;
     if (responseType == 'arraybuffer')
       response = new ArrayBufferRespone(response)
 
     deferred.call(response);
-
+    cleanup();
     response = undefined;
-    listener = undefined;
   };
 
   Deferred.next(function() {
@@ -200,9 +205,7 @@ function sendRequest(aParams) {
 
     deferred.canceller = function() {
       request.abort();
-
-      response = undefined;
-      listener = undefined;
+      cleanup();
     };
 
     if (postData &&
