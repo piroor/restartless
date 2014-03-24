@@ -21,14 +21,14 @@ var Application = (function() {
 })();
 // import base64 utilities from the js code module namespace
 try {
-  var { atob, btoa } = Components.utils.import('resource://gre/modules/Services.jsm', {});
+	var { atob, btoa } = Components.utils.import('resource://gre/modules/Services.jsm', {});
 } catch(e) {
-  Components.utils.reportError(new Error('failed to load Services.jsm'));
+	Components.utils.reportError(new Error('failed to load Services.jsm'));
 }
 try {
-  var { console } = Components.utils.import('resource://gre/modules/devtools/Console.jsm', {});
+	var { console } = Components.utils.import('resource://gre/modules/devtools/Console.jsm', {});
 } catch(e) {
-  Components.utils.reportError(new Error('failed to load Console.jsm'));
+	Components.utils.reportError(new Error('failed to load Console.jsm'));
 }
 var _namespacePrototype = {
 		Cc : Components.classes,
