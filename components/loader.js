@@ -1,11 +1,11 @@
 /**
  * @fileOverview Loader module for restartless addons
- * @author			 YUKI "Piro" Hiroshi
- * @version			11
+ * @author       YUKI "Piro" Hiroshi
+ * @version      11
  *
  * @license
- *	 The MIT License, Copyright (c) 2010-2014 YUKI "Piro" Hiroshi.
- *	 https://github.com/piroor/restartless/blob/master/license.txt
+ *   The MIT License, Copyright (c) 2010-2014 YUKI "Piro" Hiroshi.
+ *   https://github.com/piroor/restartless/blob/master/license.txt
  * @url http://github.com/piroor/restartless
  */
 
@@ -77,18 +77,17 @@ var _namespaces;
  * instead it.
  *
  * @param {String} aScriptURL
- *	 URL of a script. Wrapped version of load() can handle related path.
-
- *	 Related path will be resolved based on the location of the caller script.
+ *   URL of a script. Wrapped version of load() can handle related path.
+ *   Related path will be resolved based on the location of the caller script.
  * @param {Object=} aExportTargetForImport
- *	 EXPORTED_SYMBOLS in the loaded script will be exported to the object.
- *	 If no object is specified, symbols will be exported to the global object
- *	 of the caller.
+ *   EXPORTED_SYMBOLS in the loaded script will be exported to the object.
+ *   If no object is specified, symbols will be exported to the global object
+ *   of the caller.
  * @param {Object=} aExportTargetForRequire
- *	 Properties of "exports" in the loaded script will be exported to the object.
+ *   Properties of "exports" in the loaded script will be exported to the object.
  *
  * @returns {Object}
- *	 The global object for the loaded script.
+ *   The global object for the loaded script.
  */
 function load(aURISpec, aExportTargetForImport, aExportTargetForRequire, aRoot)
 {
@@ -159,12 +158,12 @@ var FileHandler = IOService.getProtocolHandler('file')
  * Checks existence of the file specified by the given relative path and the base URI.
  *
  * @param {String} aPath
- *	 A relative path to a file or directory, from the aBaseURI.
+ *   A relative path to a file or directory, from the aBaseURI.
  * @param {String} aBaseURI
- *	 An absolute URI (with scheme) for relative paths.
+ *   An absolute URI (with scheme) for relative paths.
  *
  * @returns {String}
- *	 If the file (or directory) exists, returns the absolute URI. Otherwise null.
+ *   If the file (or directory) exists, returns the absolute URI. Otherwise null.
  */
 function exists(aPath, aBaseURI)
 {
