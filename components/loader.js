@@ -1,13 +1,40 @@
 /**
  * @fileOverview Loader module for restartless addons
- * @author       YUKI "Piro" Hiroshi
- * @version      10
+ * @author			 YUKI "Piro" Hiroshi
+ * @version			11
  *
  * @license
- *   The MIT License, Copyright (c) 2010-2014 YUKI "Piro" Hiroshi.
- *   https://github.com/piroor/restartless/blob/master/license.txt
+ *	 The MIT License, Copyright (c) 2010-2014 YUKI "Piro" Hiroshi.
+ *	 https://github.com/piroor/restartless/blob/master/license.txt
  * @url http://github.com/piroor/restartless
  */
+
+function defineProperties(aTarget, aProperties) {
+	Object.keys(aProperties).forEach(function(aProperty) {
+		var description = Object.getOwnPropertyDescriptor(aProperties, aProperty);
+		Object.defineProperty(aTarget, aProperty, description);
+	});
+}
+
+function toPropertyDescriptors(aProperties) {
+	var descriptors = {};
+	Object.keys(aProperties).forEach(function(aProperty) {
+		var description = Object.getOwnPropertyDescriptor(aProperties, aProperty);
+		descriptors[aProperty] = description;
+	});
+	return descriptors;
+}
+
+function inherit(aParent, aExtraProperties) {
+	if (!Object.create) {
+		aExtraProperties.__proto__ = aParent;
+		return aExtraProperties;
+	}
+	if (aExtraProperties)
+		return Object.create(aParent, toPropertyDescriptors(aExtraProperties));
+	else
+		return Object.create(aParent);
+}
 
 /** You can customize shared properties for loaded scripts. */
 var Application = (function() {
@@ -42,7 +69,10 @@ var _namespacePrototype = {
 		},
 		atob    : function(aInput) {
 			return atob(aInput);
-		}
+		},
+		inherit : function(aParent, aExtraProperties) {
+			return inherit(aParent, aExtraProperties);
+		},
 	};
 var _namespaces;
 
@@ -54,18 +84,18 @@ var _namespaces;
  * instead it.
  *
  * @param {String} aScriptURL
- *   URL of a script. Wrapped version of load() can handle related path.
+ *	 URL of a script. Wrapped version of load() can handle related path.
 
- *   Related path will be resolved based on the location of the caller script.
+ *	 Related path will be resolved based on the location of the caller script.
  * @param {Object=} aExportTargetForImport
- *   EXPORTED_SYMBOLS in the loaded script will be exported to the object.
- *   If no object is specified, symbols will be exported to the global object
- *   of the caller.
+ *	 EXPORTED_SYMBOLS in the loaded script will be exported to the object.
+ *	 If no object is specified, symbols will be exported to the global object
+ *	 of the caller.
  * @param {Object=} aExportTargetForRequire
- *   Properties of "exports" in the loaded script will be exported to the object.
+ *	 Properties of "exports" in the loaded script will be exported to the object.
  *
  * @returns {Object}
- *   The global object for the loaded script.
+ *	 The global object for the loaded script.
  */
 function load(aURISpec, aExportTargetForImport, aExportTargetForRequire, aRoot)
 {
@@ -136,12 +166,12 @@ var FileHandler = IOService.getProtocolHandler('file')
  * Checks existence of the file specified by the given relative path and the base URI.
  *
  * @param {String} aPath
- *   A relative path to a file or directory, from the aBaseURI.
+ *	 A relative path to a file or directory, from the aBaseURI.
  * @param {String} aBaseURI
- *   An absolute URI (with scheme) for relative paths.
+ *	 An absolute URI (with scheme) for relative paths.
  *
  * @returns {String}
- *   If the file (or directory) exists, returns the absolute URI. Otherwise null.
+ *	 If the file (or directory) exists, returns the absolute URI. Otherwise null.
  */
 function exists(aPath, aBaseURI)
 {
@@ -159,7 +189,7 @@ function exists(aPath, aBaseURI)
 		var reader = Components.classes['@mozilla.org/libjar/zip-reader;1']
 						.createInstance(Components.interfaces.nsIZipReader);
 		reader.open(baseURI.JARFile.QueryInterface(Components.interfaces.nsIFileURL).file);
-	    try {
+			try {
 			let baseEntry = baseURI.JAREntry.replace(/[^\/]+$/, '');
 			let entries = reader.findEntries(baseEntry + aPath + '$');
 			let found = entries.hasMore();
@@ -251,8 +281,7 @@ function _createNamespace(aURISpec, aRoot)
 						IOService.newURI(aRoot, null, null)
 					) :
 					aRoot ;
-	var ns = {
-			__proto__ : _namespacePrototype,
+	var ns = inherit(_namespacePrototype, {
 			location : _createFakeLocation(baseURI),
 			exists : function(aPath, aBase) {
 				return exists(aPath, aBase || baseURI.spec);
@@ -320,16 +349,16 @@ function _createFakeLocation(aURI)
 	aURI = aURI.QueryInterface(Components.interfaces.nsIURL)
 					.QueryInterface(Components.interfaces.nsIURI);
 	return {
-		href     : aURI.spec,
-		search   : aURI.query ? '?'+aURI.query : '' ,
-		hash     : aURI.ref ? '#'+aURI.ref : '' ,
-		host     : aURI.scheme == 'jar' ? '' : aURI.hostPort,
+		href		 : aURI.spec,
+		search	 : aURI.query ? '?'+aURI.query : '' ,
+		hash		 : aURI.ref ? '#'+aURI.ref : '' ,
+		host		 : aURI.scheme == 'jar' ? '' : aURI.hostPort,
 		hostname : aURI.scheme == 'jar' ? '' : aURI.host,
-		port     : aURI.scheme == 'jar' ? -1 : aURI.port,
+		port		 : aURI.scheme == 'jar' ? -1 : aURI.port,
 		pathname : aURI.path,
 		protocol : aURI.scheme+':',
-		reload   : function() {},
-		replace  : function() {},
+		reload	 : function() {},
+		replace	: function() {},
 		toString : function() {
 			return this.href;
 		}
