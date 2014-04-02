@@ -181,7 +181,7 @@ function exists(aPath, aBaseURI)
 		var reader = Components.classes['@mozilla.org/libjar/zip-reader;1']
 						.createInstance(Components.interfaces.nsIZipReader);
 		reader.open(baseURI.JARFile.QueryInterface(Components.interfaces.nsIFileURL).file);
-			try {
+		try {
 			let baseEntry = baseURI.JAREntry.replace(/[^\/]+$/, '');
 			let entries = reader.findEntries(baseEntry + aPath + '$');
 			let found = entries.hasMore();
@@ -341,16 +341,16 @@ function _createFakeLocation(aURI)
 	aURI = aURI.QueryInterface(Components.interfaces.nsIURL)
 					.QueryInterface(Components.interfaces.nsIURI);
 	return {
-		href		 : aURI.spec,
-		search	 : aURI.query ? '?'+aURI.query : '' ,
-		hash		 : aURI.ref ? '#'+aURI.ref : '' ,
-		host		 : aURI.scheme == 'jar' ? '' : aURI.hostPort,
+		href     : aURI.spec,
+		search   : aURI.query ? '?'+aURI.query : '' ,
+		hash     : aURI.ref ? '#'+aURI.ref : '' ,
+		host     : aURI.scheme == 'jar' ? '' : aURI.hostPort,
 		hostname : aURI.scheme == 'jar' ? '' : aURI.host,
-		port		 : aURI.scheme == 'jar' ? -1 : aURI.port,
+		port     : aURI.scheme == 'jar' ? -1 : aURI.port,
 		pathname : aURI.path,
 		protocol : aURI.scheme+':',
-		reload	 : function() {},
-		replace	: function() {},
+		reload   : function() {},
+		replace  : function() {},
 		toString : function() {
 			return this.href;
 		}
