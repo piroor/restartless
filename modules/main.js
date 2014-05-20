@@ -21,6 +21,7 @@ load('lib/ToolbarItem');
 load('lib/KeyboardShortcut');
 load('lib/here');
 load('lib/easyTemplate');
+load('lib/prefs');
 // this.import() also available instead of load(), as an alias.
 // Note: don't use simply "import()" without the prefix "this.",
 // because the keyword "import" will be a reserved word in future.
@@ -50,6 +51,16 @@ Deferred.next(function() {
 var bundle = require('lib/locale')
 				.get(location.href+'/../locale/messages.properties');
 dump(bundle.getString('message')+'\n');
+
+
+/**
+ * Preferences example
+ */
+var myPrefs = prefs.createStore('extensions.restartless@piro.sakura.ne.jp.');
+//             property name, default value, preference key (optional)
+myPrefs.define('booleanProp', false, 'testBoolean2');
+myPrefs.define('integerProp', 64,    'testInteger2');
+dump('current boolean value is: '+myPrefs.booleanProp+'\n');
 
 
 /**
