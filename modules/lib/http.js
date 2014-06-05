@@ -1,7 +1,7 @@
 /**
  * @fileOverview XMLHttpRequest wrapper module for restartless addons
  * @author       YUKI "Piro" Hiroshi
- * @version      10
+ * @version      11
  * @description
  *   // get as a text
  *   http.get('http://.....',
@@ -159,6 +159,8 @@ function sendRequest(aParams) {
     throw new Error('no URL');
 
   var cleanup = function() {
+    if (!request)
+      return;
     request.removeEventListener('load', listener, false);
     request.removeEventListener('error', listener, false);
     deferred.canceller = function() {};
