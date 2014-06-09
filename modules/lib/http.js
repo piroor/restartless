@@ -1,7 +1,7 @@
 /**
  * @fileOverview XMLHttpRequest wrapper module for restartless addons
  * @author       YUKI "Piro" Hiroshi
- * @version      11
+ * @version      12
  * @description
  *   // get as a text
  *   http.get('http://.....',
@@ -31,6 +31,7 @@
  *       .next(function(aResponse) {
  *         var responseJSON = JSON.parse(aResponse.responseText);
  *       });
+ *   http.postAsForm('http://.....', { a: "true", b: "29" });
  *
  * @license
  *   The MIT License, Copyright (c) 2014 YUKI "Piro" Hiroshi.
@@ -44,6 +45,7 @@ var EXPORTED_SYMBOLS = [
   'getAsBinary',
   'post',
   'postAsJSON',
+  'postAsForm',
   'RESPONSE_TYPE',
   'RESPONSE_CONTENT_TYPE'
 ];
@@ -101,7 +103,22 @@ function postAsJSON(aURI, aPostData, aHeaders) {
   var headers = clone(aHeaders);
   var postData = JSON.stringify(aPostData);
   headers['Content-Type'] = 'application/json';
-  return post(aURI, aPostData, headers);
+  return post(aURI, postData, headers);
+}
+
+function postAsForm(aURI, aFormData, aHeaders) {
+  var headers = clone(aHeaders);
+  var postData = [];
+  Object.keys(aFormData).forEach(function(aKey) {
+    var key = encodeURIComponent(aKey);
+    var value = encodeURIComponent(aFormdata[aKey]);
+    postData.push(key + '=' + value);
+  });
+  postData = postData.join('&');
+  headers['Content-Type'] = 'application/x-www-form-urlencoded';
+  headers['Content-Length'] = postData.length;
+  headers['Connection'] = 'close';
+  return post(aURI, postData, headers);
 }
 
 
