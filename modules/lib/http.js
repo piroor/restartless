@@ -1,7 +1,7 @@
 /**
  * @fileOverview XMLHttpRequest wrapper module for restartless addons
  * @author       YUKI "Piro" Hiroshi
- * @version      12
+ * @version      13
  * @description
  *   // get as a text
  *   http.get('http://.....',
@@ -108,15 +108,12 @@ function postAsJSON(aURI, aPostData, aHeaders) {
 
 function postAsForm(aURI, aFormData, aHeaders) {
   var headers = clone(aHeaders);
-  var postData = [];
+  var postData = Cc['@mozilla.org/files/formdata;1']
+                   .createInstance(Ci.nsIDOMFormData);
   Object.keys(aFormData).forEach(function(aKey) {
-    var key = encodeURIComponent(aKey);
-    var value = encodeURIComponent(aFormdata[aKey]);
-    postData.push(key + '=' + value);
+    postData.append(aKey, aFormData[aKey]);
   });
-  postData = postData.join('&');
   headers['Content-Type'] = 'application/x-www-form-urlencoded';
-  headers['Content-Length'] = postData.length;
   headers['Connection'] = 'close';
   return post(aURI, postData, headers);
 }
