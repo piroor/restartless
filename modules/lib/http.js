@@ -1,7 +1,7 @@
 /**
  * @fileOverview XMLHttpRequest wrapper module for restartless addons
  * @author       YUKI "Piro" Hiroshi
- * @version      13
+ * @version      14
  * @description
  *   // get as a text
  *   http.get('http://.....',
@@ -113,8 +113,7 @@ function postAsForm(aURI, aFormData, aHeaders) {
   Object.keys(aFormData).forEach(function(aKey) {
     postData.append(aKey, aFormData[aKey]);
   });
-  headers['Content-Type'] = 'application/x-www-form-urlencoded';
-  headers['Connection'] = 'close';
+  delete headers['Content-Type']; // it is always multipart/form-data
   return post(aURI, postData, headers);
 }
 
