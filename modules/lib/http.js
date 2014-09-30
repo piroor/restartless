@@ -1,7 +1,7 @@
 /**
  * @fileOverview XMLHttpRequest wrapper module for restartless addons
  * @author       YUKI "Piro" Hiroshi
- * @version      10
+ * @version      14
  * @description
  *   // get as a text
  *   http.get('http://.....',
@@ -31,6 +31,7 @@
  *       .next(function(aResponse) {
  *         var responseJSON = JSON.parse(aResponse.responseText);
  *       });
+ *   http.postAsForm('http://.....', { a: "true", b: "29" });
  *
  * @license
  *   The MIT License, Copyright (c) 2014 YUKI "Piro" Hiroshi.
@@ -44,6 +45,7 @@ var EXPORTED_SYMBOLS = [
   'getAsBinary',
   'post',
   'postAsJSON',
+  'postAsForm',
   'RESPONSE_TYPE',
   'RESPONSE_CONTENT_TYPE'
 ];
@@ -101,7 +103,18 @@ function postAsJSON(aURI, aPostData, aHeaders) {
   var headers = clone(aHeaders);
   var postData = JSON.stringify(aPostData);
   headers['Content-Type'] = 'application/json';
-  return post(aURI, aPostData, headers);
+  return post(aURI, postData, headers);
+}
+
+function postAsForm(aURI, aFormData, aHeaders) {
+  var headers = clone(aHeaders);
+  var postData = Cc['@mozilla.org/files/formdata;1']
+                   .createInstance(Ci.nsIDOMFormData);
+  Object.keys(aFormData).forEach(function(aKey) {
+    postData.append(aKey, aFormData[aKey]);
+  });
+  delete headers['Content-Type']; // it is always multipart/form-data
+  return post(aURI, postData, headers);
 }
 
 
@@ -159,6 +172,8 @@ function sendRequest(aParams) {
     throw new Error('no URL');
 
   var cleanup = function() {
+    if (!request)
+      return;
     request.removeEventListener('load', listener, false);
     request.removeEventListener('error', listener, false);
     deferred.canceller = function() {};
