@@ -1,7 +1,7 @@
 /**
  * @fileOverview Configuration dialog module for restartless addons
  * @author       YUKI "Piro" Hiroshi
- * @version      13
+ * @version      14
  *
  * @license
  *   The MIT License, Copyright (c) 2011-2014 YUKI "Piro" Hiroshi.
@@ -316,13 +316,15 @@ ObserverService.addObserver(config, 'content-document-global-created', false);
 
 var WindowMediator = Cc['@mozilla.org/appshell/window-mediator;1']
 						.getService(Ci.nsIWindowMediator)
-let (managers = WindowMediator.getEnumerator('Addons:Manager')) {
+{
+	let managers = WindowMediator.getEnumerator('Addons:Manager');
 	while (managers.hasMoreElements())
 	{
 		config._onLoadManager(managers.getNext().QueryInterface(Ci.nsIDOMWindow));
 	}
 }
-let (browsers = WindowMediator.getEnumerator('navigator:browser')) {
+{
+	let browsers = WindowMediator.getEnumerator('navigator:browser');
 	while (browsers.hasMoreElements())
 	{
 		let browser = browsers.getNext().QueryInterface(Ci.nsIDOMWindow);
@@ -334,7 +336,8 @@ let (browsers = WindowMediator.getEnumerator('navigator:browser')) {
 			});
 	}
 }
-let (managers = WindowMediator.getEnumerator('Extension:Manager')) { // Firefox 3.6
+{
+	let managers = WindowMediator.getEnumerator('Extension:Manager'); // Firefox 3.6
 	while (managers.hasMoreElements())
 	{
 		config._onLoadManager(managers.getNext().QueryInterface(Ci.nsIDOMWindow));
