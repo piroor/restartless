@@ -30,6 +30,8 @@ function inherit(aParent, aExtraProperties) {
 	var ObjectClass = global.Object || Object;
 
 	if (!ObjectClass.create) {
+		// This section is for very old versions of Firefox.
+		// Never been executed on modern versions.
 		aExtraProperties = aExtraProperties || new ObjectClass;
 		aExtraProperties.__proto__ = aParent;
 		return aExtraProperties;
