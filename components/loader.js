@@ -2,10 +2,10 @@
  * @fileOverview Loader module for restartless addons
  * @author       YUKI "Piro" Hiroshi
  * @contributor  Infocatcher
- * @version      12
+ * @version      13
  *
  * @license
- *   The MIT License, Copyright (c) 2010-2014 YUKI "Piro" Hiroshi.
+ *   The MIT License, Copyright (c) 2010-2015 YUKI "Piro" Hiroshi.
  *   https://github.com/piroor/restartless/blob/master/license.txt
  * @url http://github.com/piroor/restartless
  */
@@ -30,6 +30,8 @@ function inherit(aParent, aExtraProperties) {
 	var ObjectClass = global.Object || Object;
 
 	if (!ObjectClass.create) {
+		// This section is for very old versions of Firefox.
+		// Never been executed on modern versions.
 		aExtraProperties = aExtraProperties || new ObjectClass;
 		aExtraProperties.__proto__ = aParent;
 		return aExtraProperties;
@@ -208,33 +210,6 @@ function exists(aPath, aBaseURI)
 	}
 }
 
-function doAndWait(aAsyncTask)
-{
-	const Cc = Components.classes;
-	const Ci = Components.interfaces;
-
-	var done = false;
-	var returnedValue = void(0);
-	var continuation = function(aReturnedValue) {
-			done = true;
-			returnedValue = aReturnedValue;
-		};
-
-	var timer = Cc['@mozilla.org/timer;1']
-					.createInstance(Ci.nsITimer);
-	timer.init(function() {
-		aAsyncTask(continuation);
-	}, 0, Ci.nsITimer.TYPE_ONE_SHOT);
-
-	var thread = Cc['@mozilla.org/thread-manager;1']
-					.getService(Ci.nsIThreadManager)
-					.currentThread;
-	while (!done) {
-		thread.processNextEvent(true);
-	}
-	return returnedValue;
-}
-
 function _readFrom(aURISpec, aEncoding)
 {
 	const Cc = Components.classes;
@@ -338,9 +313,6 @@ function _createNamespace(aURISpec, aRoot)
 			/* utility to read contents of a text file */
 			read : function(aURISpec, aEncoding, aBaseURI) {
 				return _readFrom(this.resolve(aURISpec, aBaseURI), aEncoding);
-			},
-			doAndWait : function(aAsyncTask) {
-				return doAndWait(aAsyncTask);
 			},
 			exports : {}
 		});

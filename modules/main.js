@@ -1,10 +1,10 @@
 /**
  * @fileOverview Main module for restartless addons
  * @author       YUKI "Piro" Hiroshi
- * @version      2
+ * @version      3
  *
  * @license
- *   The MIT License, Copyright (c) 2010 YUKI "Piro" Hiroshi.
+ *   The MIT License, Copyright (c) 2015 YUKI "Piro" Hiroshi.
  *   https://github.com/piroor/restartless/blob/master/license.txt
  * @url http://github.com/piroor/restartless
  */
@@ -143,18 +143,6 @@ function shutdown()
 		var label = doc.getElementById('helloworld');
 		label.parentNode.removeChild(label);
 	});
-
-	var result = doAndWait(function(aContinuation) {
-			// You can do an asynchronus shutdown
-			// in another event loop. Until you call
-			// the continuation function, doAndWait()
-			// stops the main event loop. If you give
-			// any argument to the continuation function,
-			// then it becomes the returned value of
-			// doAndWait() itself.
-			aContinuation('OK');
-		});
-	// result == 'OK'
 
 	// free loaded symbols
 	Deferred = undefined;

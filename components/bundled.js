@@ -1,10 +1,10 @@
 /**
  * @fileOverview Bundled Startup service for restartless addons
  * @author       YUKI "Piro" Hiroshi
- * @version      1
+ * @version      2
  *
  * @license
- *   The MIT License, Copyright (c) 2013 YUKI "Piro" Hiroshi.
+ *   The MIT License, Copyright (c) 2015 YUKI "Piro" Hiroshi.
  *   https://github.com/piroor/restartless/blob/master/license.txt
  * @url http://github.com/piroor/restartless
  */
@@ -45,7 +45,7 @@ BundledService.prototype = {
 				this.onStartup();
 				return;
 
-			case 'final-ui-startup':
+			case 'quit-application-granted':
 				Services.obs.removeObserver(this, 'quit-application-granted');
 				this.onShutdown();
 				return;
