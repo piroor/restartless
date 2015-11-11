@@ -15,7 +15,6 @@ dump('main.js loaded\n');
  * load() works like Components.utils.import(). EXPORTED_SYMBOLS
  * in loaded scripts are exported to the global object of this script.
  */
-load('lib/jsdeferred');
 load('lib/WindowManager');
 load('lib/ToolbarItem');
 load('lib/KeyboardShortcut');
@@ -28,22 +27,7 @@ load('lib/prefs');
 // https://developer.mozilla.org/en/JavaScript/Strict_mode#Paving_the_way_for_future_ECMAScript_versions
 this.import('config');
 
-/**
- * Timer sample.
- */
-var timer = require('lib/jstimer'); // CommonJS style require() also available!
-timer.setTimeout(function() {
-	dump('DELAYED CODE DONE\n');
-}, 500);
-
 var http = require('lib/http');
-
-/**
- * JSDeferred sample.
- */
-Deferred.next(function() {
-	dump('DEFERRED CODE DONE\n');
-});
 
 /**
  * Localized messages sample.
@@ -145,11 +129,9 @@ function shutdown()
 	});
 
 	// free loaded symbols
-	Deferred = undefined;
 	WindowManager = undefined;
 	ToolbarItem = undefined;
 	KeyboardShortcut = undefined;
-	timer = undefined;
 	bundle = undefined;
 	here = undefined;
 	easyTemplate = undefined;
