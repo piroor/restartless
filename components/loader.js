@@ -2,7 +2,7 @@
  * @fileOverview Loader module for restartless addons
  * @author       YUKI "Piro" Hiroshi
  * @contributor  Infocatcher
- * @version      13
+ * @version      14
  *
  * @license
  *   The MIT License, Copyright (c) 2010-2015 YUKI "Piro" Hiroshi.
@@ -42,16 +42,6 @@ function inherit(aParent, aExtraProperties) {
 		return ObjectClass.create(aParent);
 }
 
-/** You can customize shared properties for loaded scripts. */
-var Application = (function() {
-	if ('@mozilla.org/fuel/application;1' in Components.classes)
-		return Components.classes['@mozilla.org/fuel/application;1']
-				.getService(Components.interfaces.fuelIApplication);
-	if ('@mozilla.org/steel/application;1' in Components.classes)
-		return Components.classes['@mozilla.org/steel/application;1']
-				.getService(Components.interfaces.steelIApplication);
-	return null;
-})();
 // import base64 utilities from the js code module namespace
 try {
 	var { atob, btoa } = Components.utils.import('resource://gre/modules/Services.jsm', {});
@@ -68,7 +58,6 @@ var _namespacePrototype = {
 		Ci : Components.interfaces,
 		Cu : Components.utils,
 		Cr : Components.results,
-		Application : Application,
 		console : this.console,
 		btoa    : function(aInput) {
 			return btoa(aInput);
@@ -398,7 +387,6 @@ function shutdown(aReason)
 	}
 	_namespaces = void(0);
 	_namespacePrototype = void(0);
-	Application = void(0);
 
 	IOService = void(0);
 	FileHandler = void(0);

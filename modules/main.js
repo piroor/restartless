@@ -1,7 +1,7 @@
 /**
  * @fileOverview Main module for restartless addons
  * @author       YUKI "Piro" Hiroshi
- * @version      3
+ * @version      4
  *
  * @license
  *   The MIT License, Copyright (c) 2015 YUKI "Piro" Hiroshi.
@@ -82,10 +82,10 @@ function handleWindow(aWindow)
 		doc.getElementById('nav-bar'),
 		{ // options
 			onInit : function() {
-				Application.console.log('restartless-test-button: inserted ' + this.node);
+				console.log('restartless-test-button: inserted ' + this.node);
 			},
 			onDestroy : function() {
-				Application.console.log('restartless-test-button: going to be removed: ' + this.node);
+				console.log('restartless-test-button: going to be removed: ' + this.node);
 			}
 		}
 	);
