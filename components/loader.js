@@ -2,7 +2,7 @@
  * @fileOverview Loader module for restartless addons
  * @author       YUKI "Piro" Hiroshi
  * @contributor  Infocatcher
- * @version      14
+ * @version      15
  *
  * @license
  *   The MIT License, Copyright (c) 2010-2015 YUKI "Piro" Hiroshi.
@@ -28,14 +28,6 @@ function inherit(aParent, aExtraProperties) {
 	global = global || this;
 
 	var ObjectClass = global.Object || Object;
-
-	if (!ObjectClass.create) {
-		// This section is for very old versions of Firefox.
-		// Never been executed on modern versions.
-		aExtraProperties = aExtraProperties || new ObjectClass;
-		aExtraProperties.__proto__ = aParent;
-		return aExtraProperties;
-	}
 	if (aExtraProperties)
 		return ObjectClass.create(aParent, toPropertyDescriptors(aExtraProperties));
 	else
