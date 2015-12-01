@@ -30,8 +30,8 @@ var easyTemplate = {
 	_systemPrincipal : Components.classes['@mozilla.org/systemprincipal;1']
 						.createInstance(Components.interfaces.nsIPrincipal),
 	_documentPrincipal : (function() {
-		return (typeof window != 'undefined' && window && typeof window.constructor != 'function') ?
-				document.nodePrincipal : null;
+		return (typeof window != 'undefined' && window && window.document) ?
+				window.document.nodePrincipal : null;
 	})(),
 
 	_applyToString : function(aString, aNamespace) {
