@@ -107,7 +107,7 @@ function load(aURISpec, aExportTargetForImport, aExportTargetForRequire, aRoot)
 	catch(e) {
 		let message = 'Loader::load('+aURISpec+') failed!\n'+e+'\n';
 		dump(message);
-		Components.utils.reportError(message + e.stack);
+		Components.utils.reportError(message + e.stack.replace(/( -> )/g, '\n$1'));
 		throw e;
 	}
 	_exportForImport(ns, aExportTargetForImport);
@@ -351,7 +351,7 @@ function _callHandler(aHandler, aReason)
 			catch(e) {
 				let message = i+'('+aHandler+', '+aReason+')\n'+e+'\n';
 				dump(message);
-				Components.utils.reportError(message + e.stack);
+				Components.utils.reportError(message + e.stack.replace(/( -> )/g, '\n$1'));
 			}
 
 			if (result && typeof result.then == 'function') {
