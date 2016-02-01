@@ -392,30 +392,30 @@ function uninstall(aReason)
 function shutdown(aReason)
 {
 	_callHandler('shutdown', aReason)
-	.then(function() {
-	for each (let ns in _namespaces)
-	{
-		for (let i in ns.exports)
-		{
-			if (ns.exports.hasOwnProperty(i))
-				delete ns.exports[i];
-		}
-	}
-	_namespaces = void(0);
-	_namespacePrototype = void(0);
+		.then(function() {
+			for each (let ns in _namespaces)
+			{
+				for (let i in ns.exports)
+				{
+					if (ns.exports.hasOwnProperty(i))
+						delete ns.exports[i];
+				}
+			}
+			_namespaces = void(0);
+			_namespacePrototype = void(0);
 
-	IOService = void(0);
-	FileHandler = void(0);
+			IOService = void(0);
+			FileHandler = void(0);
 
-	load = void(0);
-	_exportSymbols = void(0);
-	exists = void(0);
-	_createNamespace = void(0);
-	_callHandler = void(0);
-	registerResource = void(0);
-	unregisterResource = void(0);
-	install = void(0);
-	uninstall = void(0);
-	shutdown = void(0);
-	});
+			load = void(0);
+			_exportSymbols = void(0);
+			exists = void(0);
+			_createNamespace = void(0);
+			_callHandler = void(0);
+			registerResource = void(0);
+			unregisterResource = void(0);
+			install = void(0);
+			uninstall = void(0);
+			shutdown = void(0);
+		});
 }
