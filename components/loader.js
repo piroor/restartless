@@ -45,6 +45,9 @@ try {
 } catch(e) {
 	Components.utils.reportError(new Error('failed to load Console.jsm'));
 }
+
+var { Promise } = Components.utils.import('resource://gre/modules/Promise.jsm', {});
+
 var _namespacePrototype = {
 		Cc : Components.classes,
 		Ci : Components.interfaces,
@@ -60,6 +63,7 @@ var _namespacePrototype = {
 		inherit : function(aParent, aExtraProperties) {
 			return inherit(aParent, aExtraProperties);
 		},
+		Promise : Promise,
 	};
 var _namespaces;
 
@@ -335,7 +339,6 @@ function _callHandler(aHandler, aReason)
 			});
 	}
 
-	var { Promise } = Components.utils.import('resource://gre/modules/Promise.jsm', {});
 	return new Promise(function(aResolve, aReject) {
 		var processHandler = function() {
 			var handler = handlers.shift();
@@ -406,6 +409,7 @@ function shutdown(aReason)
 
 			IOService = void(0);
 			FileHandler = void(0);
+			Promise = void(0);
 
 			load = void(0);
 			_exportSymbols = void(0);
