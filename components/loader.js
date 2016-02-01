@@ -2,7 +2,7 @@
  * @fileOverview Loader module for restartless addons
  * @author       YUKI "Piro" Hiroshi
  * @contributor  Infocatcher
- * @version      15
+ * @version      16
  *
  * @license
  *   The MIT License, Copyright (c) 2010-2015 YUKI "Piro" Hiroshi.
@@ -323,19 +323,43 @@ function _createFakeLocation(aURI)
 
 function _callHandler(aHandler, aReason)
 {
+	var handlers = [];
 	for (var i in _namespaces)
 	{
-		try {
-			if (_namespaces[i][aHandler] &&
-				typeof _namespaces[i][aHandler] == 'function')
-				_namespaces[i][aHandler](aReason);
-		}
-		catch(e) {
-			let message = i+'('+aHandler+', '+aReason+')\n'+e+'\n';
-			dump(message);
-			Components.utils.reportError(message + e.stack);
-		}
+		if (_namespaces[i][aHandler] &&
+			typeof _namespaces[i][aHandler] == 'function')
+			handlers.push({
+				key       : i,
+				namespace : _namespaces[i],
+				handler   : _namespaces[i][aHandler]
+			});
 	}
+
+	var { Promise } = Components.utils.import('resource://gre/modules/Promise.jsm', {});
+	return new Promise(function(aResolve, aReject) {
+		var processHandler = function() {
+			var handler = handlers.shift();
+			if (!handler)
+				return aResolve();
+
+			try {
+				var result = handler.handler.call(handler.namespace, aReason);
+			}
+			catch(e) {
+				let message = i+'('+aHandler+', '+aReason+')\n'+e+'\n';
+				dump(message);
+				Components.utils.reportError(message + e.stack);
+			}
+
+			if (result && typeof result.then == 'function') {
+				result.then(processHandler);
+			}
+			else {
+				processHandler();
+			}
+		};
+		processHandler();
+	});
 }
 
 function registerResource(aName, aRoot)
@@ -367,8 +391,8 @@ function uninstall(aReason)
 /** Handler for "shutdown" of the bootstrap.js */
 function shutdown(aReason)
 {
-	_callHandler('shutdown', aReason);
-
+	_callHandler('shutdown', aReason)
+	.then(function() {
 	for each (let ns in _namespaces)
 	{
 		for (let i in ns.exports)
@@ -393,4 +417,5 @@ function shutdown(aReason)
 	install = void(0);
 	uninstall = void(0);
 	shutdown = void(0);
+	});
 }
