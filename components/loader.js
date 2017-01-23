@@ -2,10 +2,10 @@
  * @fileOverview Loader module for restartless addons
  * @author       YUKI "Piro" Hiroshi
  * @contributor  Infocatcher
- * @version      16
+ * @version      17
  *
  * @license
- *   The MIT License, Copyright (c) 2010-2015 YUKI "Piro" Hiroshi.
+ *   The MIT License, Copyright (c) 2010-2017 YUKI "Piro" Hiroshi.
  *   https://github.com/piroor/restartless/blob/master/license.txt
  * @url http://github.com/piroor/restartless
  */
