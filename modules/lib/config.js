@@ -127,9 +127,10 @@ var config = {
 			let root = aSource.copy();
 			delete root['*'];
 			let attributes = root.attributes();
-			Object.keys(attributes).forEach(function(aAttribute) {
-				delete root['@'+aAttribute.name()];
-			});
+			for (let attribute of aAttribute)
+			{
+				delete root['@'+attribute.name()];
+			}
 			root = root.toXMLString()
 					.replace(
 						/<([^ ]+)([^>]+)\/>\s*$/,

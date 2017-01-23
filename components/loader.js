@@ -125,9 +125,10 @@ function _exportForImport(aSource, aTarget)
 		!aSource.EXPORTED_SYMBOLS.forEach
 		)
 		return;
-	Object.keys(aSource.EXPORTED_SYMBOLS).forEach(function(aSymbol) {
-		aTarget[aSymbol] = aSource[aSymbol];
-	});
+	for (let symbol of aSource.EXPORTED_SYMBOLS)
+	{
+		aTarget[symbol] = aSource[symbol];
+	}
 }
 
 // CommonJS style
@@ -395,13 +396,14 @@ function shutdown(aReason)
 {
 	_callHandler('shutdown', aReason)
 		.then(function() {
-			Object.keys(_namespaces).forEach(function(aNamespace) {
-				for (let i in aNamespace.exports)
+			for (let ns of _namespaces)
+			{
+				for (let i in ns.exports)
 				{
-					if (aNamespace.exports.hasOwnProperty(i))
-						delete aNamespace.exports[i];
+					if (ns.exports.hasOwnProperty(i))
+						delete ns.exports[i];
 				}
-			});
+			}
 			_namespaces = void(0);
 			_namespacePrototype = void(0);
 
