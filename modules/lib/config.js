@@ -1,10 +1,10 @@
 /**
  * @fileOverview Configuration dialog module for restartless addons
  * @author       YUKI "Piro" Hiroshi
- * @version      15
+ * @version      16
  *
  * @license
- *   The MIT License, Copyright (c) 2011-2016 YUKI "Piro" Hiroshi.
+ *   The MIT License, Copyright (c) 2011-2017 YUKI "Piro" Hiroshi.
  *   https://github.com/piroor/restartless/blob/master/license.txt
  * @url http://github.com/piroor/restartless
  */
@@ -127,7 +127,7 @@ var config = {
 			let root = aSource.copy();
 			delete root['*'];
 			let attributes = root.attributes();
-			for each (let attribute in attributes)
+			for (let attribute of aAttribute)
 			{
 				delete root['@'+attribute.name()];
 			}

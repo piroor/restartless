@@ -2,10 +2,10 @@
  * @fileOverview Loader module for restartless addons
  * @author       YUKI "Piro" Hiroshi
  * @contributor  Infocatcher
- * @version      16
+ * @version      17
  *
  * @license
- *   The MIT License, Copyright (c) 2010-2015 YUKI "Piro" Hiroshi.
+ *   The MIT License, Copyright (c) 2010-2017 YUKI "Piro" Hiroshi.
  *   https://github.com/piroor/restartless/blob/master/license.txt
  * @url http://github.com/piroor/restartless
  */
@@ -125,7 +125,7 @@ function _exportForImport(aSource, aTarget)
 		!aSource.EXPORTED_SYMBOLS.forEach
 		)
 		return;
-	for each (var symbol in aSource.EXPORTED_SYMBOLS)
+	for (let symbol of aSource.EXPORTED_SYMBOLS)
 	{
 		aTarget[symbol] = aSource[symbol];
 	}
@@ -396,7 +396,7 @@ function shutdown(aReason)
 {
 	_callHandler('shutdown', aReason)
 		.then(function() {
-			for each (let ns in _namespaces)
+			for (let ns of _namespaces)
 			{
 				for (let i in ns.exports)
 				{
