@@ -1,10 +1,10 @@
 /**
  * @fileOverview Configuration dialog module for restartless addons
  * @author       YUKI "Piro" Hiroshi
- * @version      16
+ * @version      17
  *
  * @license
- *   The MIT License, Copyright (c) 2011-2017 YUKI "Piro" Hiroshi.
+ *   The MIT License, Copyright (c) 2011-2018 YUKI "Piro" Hiroshi.
  *   https://github.com/piroor/restartless/blob/master/license.txt
  * @url http://github.com/piroor/restartless
  */
@@ -297,7 +297,7 @@ var config = {
 	_managers : []
 };
 
-var Prefs = Cc['@mozilla.org/preferences;1']
+var Prefs = Cc['@mozilla.org/preferences-service;1']
 						.getService(Ci.nsIPrefBranch);
 var DefaultPrefs = Cc['@mozilla.org/preferences-service;1']
 						.getService(Ci.nsIPrefService)
