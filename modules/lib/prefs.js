@@ -2,9 +2,9 @@
  Preferences Library
 
  Usage:
-   var value = window['piro.sakura.ne.jp'].prefs.getPref('my.extension.pref');
-   window['piro.sakura.ne.jp'].prefs.setPref('my.extension.pref', true);
-   window['piro.sakura.ne.jp'].prefs.clearPref('my.extension.pref');
+   var value = prefs.getPref('my.extension.pref');
+   prefs.setPref('my.extension.pref', true);
+   prefs.clearPref('my.extension.pref');
    var listener = {
          domains : [
            'browser.tabs',
@@ -13,14 +13,14 @@
          observe : function(aSubject, aTopic, aData)
          {
            if (aTopic != 'nsPref:changed') return;
-           var value = window['piro.sakura.ne.jp'].prefs.getPref(aData);
+           var value = prefs.getPref(aData);
          }
        };
-   window['piro.sakura.ne.jp'].prefs.addPrefListener(listener);
-   window['piro.sakura.ne.jp'].prefs.removePrefListener(listener);
+   prefs.addPrefListener(listener);
+   prefs.removePrefListener(listener);
 
    // utility
-   var store = window['piro.sakura.ne.jp'].prefs.createStore('extensions.someextension.');
+   var store = prefs.createStore('extensions.someextension.');
    // property name/key, default value
    store.define('enabled', true);
    // property name, default value, pref key (different to the name)
@@ -33,42 +33,19 @@
    http://github.com/piroor/fxaddonlib-prefs
 */
 
-/* To work as a JS Code Module  */
-if (typeof window == 'undefined' ||
-	(window && typeof window.constructor == 'function')) {
-	this.EXPORTED_SYMBOLS = ['prefs'];
-
-	// If namespace.jsm is available, export symbols to the shared namespace.
-	// See: http://github.com/piroor/fxaddonlibs/blob/master/namespace.jsm
-	try {
-		let ns = {};
-		Components.utils.import('resource://my-modules/namespace.jsm', ns);
-		/* var */ window = ns.getNamespaceFor('piro.sakura.ne.jp');
-	}
-	catch(e) {
-		window = {};
-	}
-}
+var EXPORTED_SYMBOLS = ['prefs'];
+var prefs;
 
 (function() {
-	const currentRevision = 17;
-
-	if (!('piro.sakura.ne.jp' in window)) window['piro.sakura.ne.jp'] = {};
-
-	var loadedRevision = 'prefs' in window['piro.sakura.ne.jp'] ?
-			window['piro.sakura.ne.jp'].prefs.revision :
-			0 ;
-	if (loadedRevision && loadedRevision > currentRevision) {
-		return;
-	}
+	const currentRevision = 20;
 
 	const Cc = Components.classes;
 	const Ci = Components.interfaces;
 
-	window['piro.sakura.ne.jp'].prefs = {
+	prefs = {
 		revision : currentRevision,
 
-		Prefs : Cc['@mozilla.org/preferences;1']
+		Prefs : Cc['@mozilla.org/preferences-service;1']
 					.getService(Ci.nsIPrefBranch),
 
 		DefaultPrefs : Cc['@mozilla.org/preferences-service;1']
@@ -128,7 +105,7 @@ if (typeof window == 'undefined' ||
 		setPref : function(aPrefstring, aNewValue) 
 		{
 			var branch = this.Prefs;
-			var interface = null;
+			var dataTypeInterface = null;
 			if (arguments.length > 2) {
 				for (let i = 2; i < arguments.length; i++)
 				{
@@ -138,12 +115,12 @@ if (typeof window == 'undefined' ||
 					if (arg instanceof Ci.nsIPrefBranch)
 						branch = arg;
 					else
-						interface = arg;
+						dataTypeInterface = arg;
 				}
 			}
-			if (interface &&
+			if (dataTypeInterface &&
 				aNewValue instanceof Ci.nsISupports) {
-				return branch.setComplexValue(aPrefstring, interface, aNewValue);
+				return branch.setComplexValue(aPrefstring, dataTypeInterface, aNewValue);
 			}
 			switch (typeof aNewValue)
 			{
@@ -222,7 +199,7 @@ if (typeof window == 'undefined' ||
 					if (aTopic != 'nsPref:changed')
 						return;
 					var name = keyToName[aData];
-					store[name] = window['piro.sakura.ne.jp'].prefs.getPref(aData);
+					store[name] = prefs.getPref(aData);
 				}
 			};
 			this.addPrefListener(listener);
@@ -231,12 +208,12 @@ if (typeof window == 'undefined' ||
 			var store = {
 				define : function(aName, aValue, aKey) {
 					aKey = base + (aKey || aName);
-					window['piro.sakura.ne.jp'].prefs.setDefaultPref(aKey, aValue);
-					this[aName] = window['piro.sakura.ne.jp'].prefs.getPref(aKey);
+					prefs.setDefaultPref(aKey, aValue);
+					this[aName] = prefs.getPref(aKey);
 					keyToName[aKey] = aName;
 				},
 				destroy : function() {
-					window['piro.sakura.ne.jp'].prefs.removePrefListener(listener);
+					prefs.removePrefListener(listener);
 					aDomain = undefined;
 					base = undefined;
 					listener = undefined;
@@ -248,7 +225,3 @@ if (typeof window == 'undefined' ||
 		}
 	};
 })();
-
-if (window != this) { // work as a JS Code Module
-	this.prefs = window['piro.sakura.ne.jp'].prefs;
-}
